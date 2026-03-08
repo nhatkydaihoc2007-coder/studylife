@@ -720,9 +720,15 @@ textarea.fi{resize:vertical;min-height:70px;}
               </select>
             </div>
           </div>
-          <div class="fg">
-            <label>Ghi chú (tuỳ chọn)</label>
-            <input class="fi" id="exp-note" placeholder="Ghi chú thêm...">
+          <div class="form-row">
+            <div class="fg">
+              <label>📅 Ngày giao dịch</label>
+              <input class="fi" id="exp-date" type="date">
+            </div>
+            <div class="fg">
+              <label>Ghi chú (tuỳ chọn)</label>
+              <input class="fi" id="exp-note" placeholder="Ghi chú thêm...">
+            </div>
           </div>
           <button class="btn btn-primary" style="width:100%" onclick="addExpense()">+ Thêm giao dịch</button>
         </div>
@@ -1903,6 +1909,8 @@ function renderNotes(){
 //  EXPENSE
 // ═══════════════════════════════════════════
 function renderExpenses(){
+  const dateInp=document.getElementById('exp-date');
+  if(dateInp&&!dateInp.value) dateInp.value=new Date().toISOString().split('T')[0];
   const expenses=load(KEYS.expenses,[]);
   const budget=load(KEYS.budget,{total:2000000});
 
@@ -1980,20 +1988,22 @@ function addExpense(){
   const amt=parseFloat(document.getElementById('exp-amt').value);
   if(!name||!amt||isNaN(amt)){toast('❌ Vui lòng điền đầy đủ!','error');return;}
   const type=document.getElementById('exp-type').value;
+  const dateVal=document.getElementById('exp-date').value||new Date().toISOString().split('T')[0];
   const exp=load(KEYS.expenses,[]);
   exp.unshift({
     id:Date.now(),name,
     cat:document.getElementById('exp-cat').value,
     amount:type==='expense'?-amt:amt,
-    date:new Date().toISOString().split('T')[0],
+    date:dateVal,
     note:document.getElementById('exp-note').value,
   });
   save(KEYS.expenses,exp);
   document.getElementById('exp-name').value='';
   document.getElementById('exp-amt').value='';
   document.getElementById('exp-note').value='';
+  document.getElementById('exp-date').value=new Date().toISOString().split('T')[0];
   renderExpenses();
-  toast('✅ Đã thêm giao dịch!','success');
+  toast('✅ Đã thêm giao dịch ngày '+fmtDate(dateVal)+'!','success');
 }
 
 function deleteExpense(id){
