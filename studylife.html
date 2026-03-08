@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyLife — Quản lý đời sống sinh viên</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080810;--bg2:#0f0f1a;--bg3:#161625;
+  --surface:#13131e;--surface2:#1c1c2e;--surface3:#22223a;
+  --border:#2d2d4a;--border2:#3a3a58;
+  --accent:#7c6af7;--accent-glow:rgba(124,106,247,0.35);
+  --teal:#2dd4bf;--pink:#f472b6;--amber:#fbbf24;--green:#34d399;--red:#f87171;
+  --text:#eeeef8;--text2:#8888b0;--text3:#4a4a6a;
+  --r:14px;--rs:8px;--sidebar:240px;
+  --font:'Plus Jakarta Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar);height:100vh;overflow-y:auto;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:20px 12px;gap:2px;
+  position:fixed;top:0;left:0;z-index:100;flex-shrink:0;
+}
+.logo{
+  font-size:20px;font-weight:900;letter-spacing:-0.5px;
+  padding:8px 12px 18px;
+  background:linear-gradient(135deg,var(--accent),var(--teal));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-section{
+  font-size:9px;font-weight:700;letter-spacing:2px;color:var(--text3);
+  text-transform:uppercase;padding:14px 12px 4px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
+  border-radius:var(--rs);cursor:pointer;color:var(--text2);font-size:13px;
+  font-weight:600;transition:all .18s;border:1px solid transparent;
+  user-select:none;
+}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(124,106,247,.18);color:var(--accent);border-color:rgba(124,106,247,.3);}
+.nav-item .ni{font-size:15px;width:20px;text-align:center;}
+.nav-badge{
+  margin-left:auto;background:var(--pink);color:#fff;
+  font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;min-width:18px;text-align:center;
+}
+.sidebar-footer{
+  margin-top:auto;padding:12px;background:var(--surface2);
+  border-radius:var(--rs);border:1px solid var(--border);cursor:pointer;
+}
+.sidebar-footer:hover{border-color:var(--accent);}
+.sf-name{font-size:13px;font-weight:700;}
+.sf-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.sf-edit{font-size:11px;color:var(--accent);margin-top:6px;}
+
+/* MAIN */
+.main{
+  margin-left:var(--sidebar);flex:1;
+  height:100vh;overflow-y:auto;display:flex;flex-direction:column;
+}
+.topbar{
+  position:sticky;top:0;
+  background:rgba(8,8,16,.9);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);padding:14px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  z-index:50;flex-shrink:0;
+}
+.topbar-left .pt{font-size:19px;font-weight:800;}
+.topbar-left .ps{font-size:12px;color:var(--text3);margin-top:2px;}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+.save-indicator{font-size:11px;color:var(--green);padding:4px 10px;
+  background:rgba(52,211,153,.12);border-radius:20px;border:1px solid rgba(52,211,153,.3);}
+.content{padding:24px 28px;flex:1;}
+
+/* BUTTONS */
+.btn{
+  padding:8px 16px;border-radius:var(--rs);border:none;cursor:pointer;
+  font-family:var(--font);font-size:13px;font-weight:700;transition:all .18s;
+}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#6a58e5;transform:translateY(-1px);}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+.btn-danger{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3);}
+.btn-danger:hover{background:rgba(248,113,113,.25);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-icon{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px;}
+
+/* PAGES */
+.page{display:none;}
+.page.active{display:block;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
+.card-title{font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+
+/* GRID UTILS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.mb16{margin-bottom:16px;}
+.mb20{margin-bottom:20px;}
+.mb24{margin-bottom:24px;}
+
+/* STAT CARDS */
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px;position:relative;overflow:hidden;
+}
+.stat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--stat-color,var(--accent));
+}
+.stat-icon{font-size:24px;margin-bottom:10px;}
+.stat-val{font-size:28px;font-weight:900;line-height:1;}
+.stat-lbl{font-size:12px;color:var(--text2);margin-top:4px;}
+.stat-chg{font-size:11px;margin-top:8px;color:var(--green);}
+
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sh-title{font-size:15px;font-weight:800;}
+
+/* PROGRESS */
+.prog-wrap{margin:10px 0;}
+.prog-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+.prog-bar{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+
+/* FORM */
+.form-row{display:flex;gap:12px;}
+.form-row>.fg{flex:1;}
+.fg{margin-bottom:12px;}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.fi,.fs{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--rs);padding:9px 12px;color:var(--text);
+  font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s;
+}
+.fi:focus,.fs:focus{border-color:var(--accent);}
+.fi::placeholder{color:var(--text3);}
+textarea.fi{resize:vertical;min-height:70px;}
+
+/* MODAL */
+.overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;
+}
+.overlay.open{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:16px;
+  padding:28px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;
+  animation:mUp .25s ease;
+}
+@keyframes mUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);
+  padding:12px 18px;font-size:13px;font-weight:600;z-index:9999;
+  animation:toastIn .25s ease;pointer-events:none;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  display:flex;align-items:center;gap:8px;
+}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* TAG / BADGE */
+.tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.tag-purple{background:rgba(124,106,247,.2);color:var(--accent);}
+.tag-teal{background:rgba(45,212,191,.2);color:var(--teal);}
+.tag-pink{background:rgba(244,114,182,.2);color:var(--pink);}
+.tag-amber{background:rgba(251,191,36,.2);color:var(--amber);}
+.tag-green{background:rgba(52,211,153,.2);color:var(--green);}
+.tag-red{background:rgba(248,113,113,.2);color:var(--red);}
+
+/* ===== DASHBOARD ===== */
+.dash-schedule-item{
+  display:flex;align-items:flex-start;gap:12px;padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.dash-schedule-item:last-child{border-bottom:none;}
+.dsi-time{font-family:var(--mono);font-size:11px;color:var(--text3);min-width:50px;padding-top:2px;}
+.dsi-bar{width:3px;border-radius:2px;min-height:36px;flex-shrink:0;}
+.dsi-info{flex:1;}
+.dsi-name{font-size:13px;font-weight:700;}
+.dsi-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+
+.dash-dl-item{
+  display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--border);
+}
+.dash-dl-item:last-child{border-bottom:none;}
+.ddi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ddi-name{flex:1;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ddi-days{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0;}
+
+/* ===== SCHEDULE ===== */
+.day-tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.day-tab{
+  padding:7px 16px;border-radius:20px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text2);cursor:pointer;
+  font-family:var(--font);font-size:13px;font-weight:600;transition:all .18s;
+}
+.day-tab:hover{border-color:var(--accent);color:var(--accent);}
+.day-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.class-item{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px 18px;display:flex;align-items:center;gap:14px;
+  transition:all .18s;border-left:4px solid transparent;margin-bottom:10px;
+}
+.class-item:hover{background:var(--surface2);}
+.ci-time{font-family:var(--mono);font-size:11px;color:var(--text3);min-width:85px;}
+.ci-body{flex:1;}
+.ci-name{font-size:14px;font-weight:700;}
+.ci-meta{font-size:12px;color:var(--text3);margin-top:3px;}
+.ci-actions{display:flex;gap:6px;opacity:0;transition:opacity .18s;}
+.class-item:hover .ci-actions{opacity:1;}
+
+/* ===== DEADLINES ===== */
+.dl-filters{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.dl-filter{
+  padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);cursor:pointer;
+  font-family:var(--font);font-size:12px;font-weight:600;transition:all .18s;
+}
+.dl-filter:hover,.dl-filter.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.dl-item{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px 18px;display:flex;align-items:center;gap:12px;
+  transition:all .18s;margin-bottom:10px;
+}
+.dl-item:hover{background:var(--surface2);}
+.dl-item.done{opacity:.45;}
+.dl-item.done .dl-name{text-decoration:line-through;}
+.dl-check{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:11px;transition:all .18s;
+}
+.dl-check.on{background:var(--green);border-color:var(--green);color:#fff;}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dl-body{flex:1;min-width:0;}
+.dl-name{font-size:14px;font-weight:700;}
+.dl-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.dl-right{text-align:right;flex-shrink:0;}
+.dl-date{font-size:12px;font-weight:700;}
+.dl-rem{font-size:11px;color:var(--text3);margin-top:2px;}
+.dl-actions{display:flex;gap:4px;opacity:0;transition:opacity .18s;}
+.dl-item:hover .dl-actions{opacity:1;}
+
+/* ===== TRACKER ===== */
+.timer-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:28px;text-align:center;
+}
+.timer-face{
+  font-family:var(--mono);font-size:56px;font-weight:700;line-height:1;
+  background:linear-gradient(135deg,var(--accent),var(--teal));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin:16px 0;
+}
+.timer-controls{display:flex;justify-content:center;gap:10px;margin-top:16px;}
+.btn-circle{
+  width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;
+  font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .18s;
+}
+.bc-play{background:var(--accent);color:#fff;}
+.bc-play:hover{transform:scale(1.08);}
+.bc-stop{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+.bc-stop:hover{color:var(--text);}
+
+.session-log{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.session-log-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.sl-item{
+  display:flex;align-items:center;gap:12px;padding:11px 18px;
+  border-bottom:1px solid var(--border);font-size:13px;
+}
+.sl-item:last-child{border-bottom:none;}
+.sl-item:hover{background:var(--surface2);}
+.sl-subject{font-weight:700;flex:1;}
+.sl-duration{font-family:var(--mono);font-size:12px;color:var(--teal);font-weight:600;}
+.sl-time{font-size:11px;color:var(--text3);}
+
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px;}
+.hm-cell{aspect-ratio:1;border-radius:3px;background:var(--bg3);cursor:pointer;transition:transform .15s;}
+.hm-cell:hover{transform:scale(1.25);}
+.hm-cell.l1{background:rgba(124,106,247,.2);}
+.hm-cell.l2{background:rgba(124,106,247,.45);}
+.hm-cell.l3{background:rgba(124,106,247,.7);}
+.hm-cell.l4{background:var(--accent);}
+
+/* ===== FOCUS ===== */
+.focus-wrap{max-width:560px;margin:0 auto;text-align:center;}
+.focus-ring{
+  width:260px;height:260px;border-radius:50%;margin:0 auto 24px;
+  display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;
+}
+.focus-ring svg{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg);}
+.focus-ring circle{fill:none;stroke-width:7;stroke-linecap:round;}
+.focus-bg-c{stroke:var(--bg3);}
+.focus-pr-c{stroke:url(#fg);transition:stroke-dashoffset 1s linear;}
+.focus-inner{position:relative;z-index:1;}
+.focus-time{font-family:var(--mono);font-size:48px;font-weight:700;color:var(--text);}
+.focus-lbl{font-size:12px;color:var(--text3);margin-top:4px;}
+.focus-presets{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.fp-btn{
+  padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text2);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:700;transition:all .18s;
+}
+.fp-btn:hover,.fp-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.sound-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px;}
+.sound-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px;cursor:pointer;transition:all .18s;text-align:center;
+}
+.sound-card:hover{border-color:var(--accent);}
+.sound-card.active{border-color:var(--accent);background:rgba(124,106,247,.12);}
+.sound-icon{font-size:24px;margin-bottom:6px;}
+.sound-name{font-size:12px;font-weight:700;}
+
+/* ===== EXPENSE ===== */
+.exp-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.exp-sum-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px;text-align:center;
+}
+.exp-amount{font-size:26px;font-weight:900;}
+.exp-lbl{font-size:12px;color:var(--text3);margin-top:4px;}
+.exp-item{
+  display:flex;align-items:center;gap:12px;padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.exp-item:last-child{border-bottom:none;}
+.exp-item:hover .exp-act{opacity:1;}
+.exp-cat-icon{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+}
+.exp-info{flex:1;min-width:0;}
+.exp-name{font-size:13px;font-weight:700;}
+.exp-date{font-size:11px;color:var(--text3);}
+.exp-val{font-size:14px;font-weight:800;}
+.exp-neg{color:var(--pink);}
+.exp-pos{color:var(--green);}
+.exp-act{display:flex;gap:4px;opacity:0;transition:opacity .18s;}
+
+.budget-cat{margin-bottom:14px;}
+.bc-header{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:5px;}
+.bc-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.bc-fill{height:100%;border-radius:4px;transition:width .6s;}
+.bc-warn .bc-fill{background:var(--red) !important;}
+
+/* ===== GOALS ===== */
+.goal-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px;transition:all .2s;cursor:pointer;position:relative;
+}
+.goal-card:hover{transform:translateY(-2px);border-color:var(--accent);}
+.goal-card:hover .goal-actions{opacity:1;}
+.goal-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.goal-emoji{font-size:28px;}
+.goal-title{font-size:15px;font-weight:800;margin-bottom:4px;}
+.goal-desc{font-size:12px;color:var(--text3);margin-bottom:12px;}
+.goal-pct{font-size:12px;font-weight:700;text-align:right;margin-bottom:5px;}
+.goal-actions{position:absolute;top:14px;right:14px;display:flex;gap:4px;opacity:0;transition:opacity .18s;}
+.goal-deadline{font-size:11px;color:var(--text3);margin-top:8px;}
+
+/* ===== STATS ===== */
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:10px;}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;}
+.bar{width:100%;border-radius:4px 4px 0 0;cursor:pointer;transition:filter .15s;}
+.bar:hover{filter:brightness(1.3);}
+.bar-lbl{font-size:10px;color:var(--text3);}
+.bar-val{font-size:10px;font-weight:700;}
+.donut{
+  width:130px;height:130px;border-radius:50%;margin:0 auto;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:900;
+}
+.legend{margin-top:10px;}
+.leg-item{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:7px;}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+
+/* ===== NOTES ===== */
+.note-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px;transition:all .18s;cursor:pointer;
+}
+.note-card:hover{background:var(--surface2);border-color:var(--border2);}
+.note-card:hover .note-acts{opacity:1;}
+.note-title{font-size:14px;font-weight:700;margin-bottom:6px;}
+.note-preview{font-size:12px;color:var(--text2);line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.note-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.note-date{font-size:11px;color:var(--text3);}
+.note-acts{display:flex;gap:4px;opacity:0;transition:opacity .18s;}
+.notes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+
+/* ===== PROFILE ===== */
+.profile-header{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:28px;display:flex;align-items:center;gap:20px;margin-bottom:20px;
+}
+.avatar{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--teal));
+  display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;
+}
+.pf-name{font-size:22px;font-weight:900;}
+.pf-sub{font-size:13px;color:var(--text3);margin-top:4px;}
+.pf-badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.pf-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;}
+
+/* ===== EMPTY ===== */
+.empty{
+  text-align:center;padding:48px 20px;color:var(--text3);
+}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty p{font-size:14px;}
+
+/* responsive */
+@media(max-width:900px){
+  :root{--sidebar:200px;}
+  .g4{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">Study<span style="-webkit-text-fill-color:var(--text2);font-weight:300">Life</span></div>
+
+  <div class="nav-section">Tổng quan</div>
+  <div class="nav-item active" onclick="nav('dashboard')"><span class="ni">📊</span>Dashboard</div>
+
+  <div class="nav-section">Học tập</div>
+  <div class="nav-item" onclick="nav('schedule')"><span class="ni">📅</span>Thời khóa biểu</div>
+  <div class="nav-item" onclick="nav('deadlines')"><span class="ni">⏰</span>Deadline<span class="nav-badge" id="dl-badge">0</span></div>
+  <div class="nav-item" onclick="nav('tracker')"><span class="ni">📚</span>Study Tracker</div>
+  <div class="nav-item" onclick="nav('focus')"><span class="ni">🎯</span>Focus Mode</div>
+  <div class="nav-item" onclick="nav('notes')"><span class="ni">📝</span>Ghi chú</div>
+
+  <div class="nav-section">Cá nhân</div>
+  <div class="nav-item" onclick="nav('expense')"><span class="ni">💰</span>Chi tiêu</div>
+  <div class="nav-item" onclick="nav('goals')"><span class="ni">🏆</span>Mục tiêu</div>
+  <div class="nav-item" onclick="nav('stats')"><span class="ni">📈</span>Thống kê</div>
+  <div class="nav-item" onclick="nav('profile')"><span class="ni">👤</span>Hồ sơ</div>
+
+  <div class="sidebar-footer" onclick="nav('profile')">
+    <div class="sf-name" id="sf-name">👤 Sinh viên</div>
+    <div class="sf-sub" id="sf-sub">Khoa CNTT</div>
+    <div class="sf-edit">✏️ Chỉnh sửa hồ sơ →</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main" id="main-scroll">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="pt" id="pt">Dashboard</div>
+      <div class="ps" id="ps">Chào mừng trở lại! 👋</div>
+    </div>
+    <div class="topbar-right">
+      <span class="save-indicator" id="save-ind" style="display:none">✓ Đã lưu</span>
+      <button class="btn btn-ghost btn-sm" onclick="exportData()">📥 Xuất dữ liệu</button>
+      <button class="btn btn-primary btn-sm" id="action-btn" onclick="handleAction()">+ Thêm mới</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+  <!-- ════ DASHBOARD ════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="g4 mb24" id="dash-stats"></div>
+    <div class="g2 mb20">
+      <div class="card">
+        <div class="card-title">📅 Lịch hôm nay</div>
+        <div id="dash-today"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">⏰ Deadline sắp tới</div>
+        <div id="dash-dl"></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-title">📊 Tiến độ môn học</div>
+        <div id="dash-progress"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏆 Mục tiêu tháng</div>
+        <div id="dash-goals"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SCHEDULE ════ -->
+  <div class="page" id="page-schedule">
+    <div class="day-tabs" id="day-tabs"></div>
+    <div class="sh">
+      <div class="sh-title" id="sched-day-title"></div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-class')">+ Thêm lớp học</button>
+    </div>
+    <div id="sched-list"></div>
+  </div>
+
+  <!-- ════ DEADLINES ════ -->
+  <div class="page" id="page-deadlines">
+    <div class="dl-filters">
+      <button class="dl-filter active" onclick="dlFilter(this,'all')">Tất cả</button>
+      <button class="dl-filter" onclick="dlFilter(this,'urgent')">🔴 Khẩn cấp ≤3 ngày</button>
+      <button class="dl-filter" onclick="dlFilter(this,'week')">📅 Tuần này</button>
+      <button class="dl-filter" onclick="dlFilter(this,'pending')">⏳ Chưa xong</button>
+      <button class="dl-filter" onclick="dlFilter(this,'done')">✅ Hoàn thành</button>
+    </div>
+    <div id="dl-list"></div>
+  </div>
+
+  <!-- ════ TRACKER ════ -->
+  <div class="page" id="page-tracker">
+    <div class="g2 mb20">
+      <div class="timer-card">
+        <div class="card-title" style="text-align:center">⏱ Session học</div>
+        <select class="fs" id="tr-subject" style="max-width:200px;margin:0 auto;display:block" onchange="updateTrSubject()">
+          <option value="">-- Chọn môn học --</option>
+        </select>
+        <div class="timer-face" id="tr-timer">00:00:00</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:4px">
+          Đang học: <span id="tr-subj-name" style="color:var(--accent);font-weight:700">Chưa chọn</span>
+        </div>
+        <div class="timer-controls">
+          <button class="btn-circle bc-play" id="tr-btn" onclick="toggleTimer()">▶</button>
+          <button class="btn-circle bc-stop" onclick="resetTimer()">⏹</button>
+        </div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text3)">
+          Tổng hôm nay: <span id="tr-today" style="color:var(--green);font-weight:800">0p</span> &nbsp;|&nbsp;
+          Tuần này: <span id="tr-week" style="color:var(--teal);font-weight:800">0h</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sh"><div class="sh-title">📊 Giờ học theo môn</div></div>
+        <div id="tr-subject-bars"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sh">
+        <div class="sh-title">📆 Heatmap học tập — Tháng này</div>
+        <div style="font-size:12px;color:var(--text3)">Tổng: <span id="tr-total" style="color:var(--accent);font-weight:700">0h</span></div>
+      </div>
+      <div style="display:flex;gap:5px;margin-bottom:6px">
+        <span style="font-size:10px;color:var(--text3);flex:1;text-align:center" v-for="d in days">T2</span>
+        <span style="font-size:10px;color:var(--text3);flex:1;text-align:center">T2</span>
+        <span style="font-size:10px;color:var(--text3);flex:1;text-align:center">T3</span>
+        <span style="font-size:10px;color:var(--text3);flex:1;text-align:center">T4</span>
+        <span style="font-size:10px;color:var(--text3);flex:1;text-align:center">T5</span>
+        <span style="font-size:10px;color:var(--text3);flex:1;text-align:center">T6</span>
+        <span style="font-size:10px;color:var(--text3);flex:1;text-align:center">T7</span>
+        <span style="font-size:10px;color:var(--text3);flex:1;text-align:center">CN</span>
+      </div>
+      <div class="heatmap" id="tr-heatmap"></div>
+      <div style="display:flex;gap:5px;align-items:center;margin-top:8px;font-size:11px;color:var(--text3)">
+        Ít
+        <div style="width:11px;height:11px;border-radius:3px;background:var(--bg3)"></div>
+        <div style="width:11px;height:11px;border-radius:3px" class="hm-cell l1"></div>
+        <div style="width:11px;height:11px;border-radius:3px" class="hm-cell l2"></div>
+        <div style="width:11px;height:11px;border-radius:3px" class="hm-cell l3"></div>
+        <div style="width:11px;height:11px;border-radius:3px" class="hm-cell l4"></div>
+        Nhiều
+      </div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <div class="session-log-header sh">
+        <div class="sh-title">📋 Lịch sử học tập</div>
+        <button class="btn btn-ghost btn-sm" onclick="clearSessions()">🗑 Xóa tất cả</button>
+      </div>
+      <div id="tr-sessions"></div>
+    </div>
+  </div>
+
+  <!-- ════ FOCUS ════ -->
+  <div class="page" id="page-focus">
+    <div class="focus-wrap">
+      <div class="focus-presets" id="focus-presets">
+        <button class="fp-btn active" onclick="setFocus(this,25,'🍅 Pomodoro')">🍅 25 phút</button>
+        <button class="fp-btn" onclick="setFocus(this,45,'⚡ Deep Work')">⚡ 45 phút</button>
+        <button class="fp-btn" onclick="setFocus(this,90,'🧠 Flow State')">🧠 90 phút</button>
+        <button class="fp-btn" onclick="setFocus(this,5,'☕ Break')">☕ Break 5p</button>
+        <button class="fp-btn" onclick="setFocus(this,15,'🌿 Break dài')">🌿 Break 15p</button>
+      </div>
+
+      <div class="focus-ring" onclick="toggleFocus()">
+        <svg viewBox="0 0 260 260">
+          <defs>
+            <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#7c6af7"/>
+              <stop offset="100%" style="stop-color:#2dd4bf"/>
+            </linearGradient>
+          </defs>
+          <circle class="focus-bg-c" cx="130" cy="130" r="120" stroke-width="7"/>
+          <circle class="focus-pr-c" cx="130" cy="130" r="120" stroke-width="7"
+            stroke-dasharray="753.6" stroke-dashoffset="753.6" id="focus-circle"/>
+        </svg>
+        <div class="focus-inner">
+          <div class="focus-time" id="focus-display">25:00</div>
+          <div class="focus-lbl" id="focus-lbl">Nhấn để bắt đầu</div>
+        </div>
+      </div>
+
+      <div class="g3 mb20" style="max-width:400px;margin:0 auto 20px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:var(--accent)" id="focus-pomo-count">0</div>
+          <div style="font-size:11px;color:var(--text3)">Pomodoros</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:var(--green)" id="focus-total-min">0m</div>
+          <div style="font-size:11px;color:var(--text3)">Hôm nay</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:var(--amber)" id="focus-streak">🔥0</div>
+          <div style="font-size:11px;color:var(--text3)">Ngày streak</div>
+        </div>
+      </div>
+
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;text-align:left">🎵 Âm thanh nền</div>
+      <div class="sound-grid" id="sound-grid">
+        <div class="sound-card active" onclick="selectSound(this,'none')">
+          <div class="sound-icon">🔇</div><div class="sound-name">Yên lặng</div>
+        </div>
+        <div class="sound-card" onclick="selectSound(this,'lofi')">
+          <div class="sound-icon">🎵</div><div class="sound-name">Lo-fi</div>
+        </div>
+        <div class="sound-card" onclick="selectSound(this,'rain')">
+          <div class="sound-icon">🌧</div><div class="sound-name">Tiếng mưa</div>
+        </div>
+        <div class="sound-card" onclick="selectSound(this,'forest')">
+          <div class="sound-icon">🌲</div><div class="sound-name">Rừng</div>
+        </div>
+        <div class="sound-card" onclick="selectSound(this,'cafe')">
+          <div class="sound-icon">☕</div><div class="sound-name">Quán cà phê</div>
+        </div>
+        <div class="sound-card" onclick="selectSound(this,'waves')">
+          <div class="sound-icon">🌊</div><div class="sound-name">Sóng biển</div>
+        </div>
+        <div class="sound-card" onclick="selectSound(this,'white')">
+          <div class="sound-icon">💨</div><div class="sound-name">White Noise</div>
+        </div>
+        <div class="sound-card" onclick="selectSound(this,'fire')">
+          <div class="sound-icon">🔥</div><div class="sound-name">Lửa trại</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ NOTES ════ -->
+  <div class="page" id="page-notes">
+    <div class="sh mb20">
+      <div>
+        <div class="sh-title">📝 Ghi chú</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px" id="notes-count">0 ghi chú</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input class="fi" id="note-search" placeholder="🔍 Tìm ghi chú..." style="width:200px" oninput="renderNotes()">
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-note')">+ Ghi chú mới</button>
+      </div>
+    </div>
+    <div class="notes-grid" id="notes-grid"></div>
+  </div>
+
+  <!-- ════ EXPENSE ════ -->
+  <div class="page" id="page-expense">
+    <div class="exp-summary" id="exp-summary"></div>
+    <div class="g2">
+      <div>
+        <div class="card mb16">
+          <div class="card-title">➕ Thêm giao dịch</div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Tên</label>
+              <input class="fi" id="exp-name" placeholder="VD: Tiền cơm">
+            </div>
+            <div class="fg" style="max-width:130px">
+              <label>Số tiền (₫)</label>
+              <input class="fi" id="exp-amt" type="number" placeholder="50000">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Danh mục</label>
+              <select class="fs" id="exp-cat">
+                <option value="food">🍜 Ăn uống</option>
+                <option value="transport">🚌 Di chuyển</option>
+                <option value="study">📚 Học tập</option>
+                <option value="entertainment">🎮 Giải trí</option>
+                <option value="health">💊 Sức khỏe</option>
+                <option value="clothing">👕 Quần áo</option>
+                <option value="other">📦 Khác</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Loại</label>
+              <select class="fs" id="exp-type">
+                <option value="expense">💸 Chi tiêu</option>
+                <option value="income">💵 Thu nhập</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg">
+            <label>Ghi chú (tuỳ chọn)</label>
+            <input class="fi" id="exp-note" placeholder="Ghi chú thêm...">
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="addExpense()">+ Thêm giao dịch</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📊 Ngân sách danh mục</div>
+          <div id="exp-budget-bars"></div>
+          <div style="margin-top:12px">
+            <button class="btn btn-ghost btn-sm" onclick="openModal('modal-budget')">⚙️ Cài đặt ngân sách</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sh">
+          <div class="sh-title">💸 Lịch sử giao dịch</div>
+          <div style="display:flex;gap:6px">
+            <select class="fs" id="exp-month-filter" style="font-size:12px;padding:4px 8px" onchange="renderExpenses()">
+            </select>
+          </div>
+        </div>
+        <div id="exp-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ GOALS ════ -->
+  <div class="page" id="page-goals">
+    <div class="sh mb20">
+      <div>
+        <div class="sh-title">🏆 Mục tiêu cá nhân</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px" id="goals-summary-text"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-goal')">+ Mục tiêu mới</button>
+    </div>
+    <div class="g2" id="goals-grid"></div>
+  </div>
+
+  <!-- ════ STATS ════ -->
+  <div class="page" id="page-stats">
+    <div class="g2 mb20">
+      <div class="card">
+        <div class="card-title">📅 Giờ học theo tuần</div>
+        <div class="bar-chart" id="st-weekly-chart"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">💰 Chi tiêu theo danh mục</div>
+        <div style="display:flex;gap:20px;align-items:center;margin-top:8px">
+          <div class="donut" id="st-expense-donut"></div>
+          <div class="legend" id="st-expense-legend"></div>
+        </div>
+      </div>
+    </div>
+    <div class="g2 mb20">
+      <div class="card">
+        <div class="card-title">⏰ Deadline hoàn thành</div>
+        <div style="display:flex;gap:20px;align-items:center;margin-top:8px">
+          <div class="donut" id="st-dl-donut"></div>
+          <div id="st-dl-info" style="flex:1"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 Focus sessions — 7 ngày</div>
+        <div class="bar-chart" id="st-focus-chart"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Tổng kết học kỳ</div>
+      <div class="g4" id="st-summary" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- ════ PROFILE ════ -->
+  <div class="page" id="page-profile">
+    <div class="profile-header">
+      <div class="avatar" id="pf-avatar">👤</div>
+      <div style="flex:1">
+        <div class="pf-name" id="pf-name-display">Sinh viên</div>
+        <div class="pf-sub" id="pf-sub-display">Chưa cập nhật thông tin</div>
+        <div class="pf-badges" id="pf-badges"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-profile')">✏️ Chỉnh sửa</button>
+    </div>
+    <div class="pf-grid">
+      <div>
+        <div class="card mb16">
+          <div class="card-title">📚 Môn học đang theo</div>
+          <div id="pf-subjects"></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="openModal('modal-subject')">+ Thêm môn học</button>
+        </div>
+        <div class="card">
+          <div class="card-title">⚙️ Cài đặt</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:13px;font-weight:600">Ngân sách tháng</div>
+                <div style="font-size:12px;color:var(--text3)">Giới hạn chi tiêu mỗi tháng</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-budget')">⚙️ Cài đặt</button>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:13px;font-weight:600">Xóa toàn bộ dữ liệu</div>
+                <div style="font-size:12px;color:var(--text3)">Khôi phục về ban đầu</div>
+              </div>
+              <button class="btn btn-danger btn-sm" onclick="resetAllData()">🗑 Xóa tất cả</button>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+              <div>
+                <div style="font-size:13px;font-weight:600">Nhập dữ liệu</div>
+                <div style="font-size:12px;color:var(--text3)">Khôi phục từ file backup</div>
+              </div>
+              <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+                📂 Nhập file
+                <input type="file" accept=".json" style="display:none" onchange="importData(this)">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card mb16">
+          <div class="card-title">📊 Thống kê nhanh</div>
+          <div id="pf-quick-stats"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🏅 Thành tích</div>
+          <div id="pf-achievements"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ════ MODALS ════ -->
+
+<!-- Deadline Modal -->
+<div class="overlay" id="modal-dl">
+  <div class="modal">
+    <div class="modal-title">⏰ <span id="modal-dl-title">Thêm Deadline</span></div>
+    <input type="hidden" id="dl-edit-id">
+    <div class="fg"><label>Tên deadline / bài tập *</label>
+      <input class="fi" id="dl-name" placeholder="VD: Bài tập lớn môn Giải tích"></div>
+    <div class="form-row">
+      <div class="fg"><label>Môn học</label>
+        <select class="fs" id="dl-subject"></select></div>
+      <div class="fg"><label>Ưu tiên</label>
+        <select class="fs" id="dl-priority">
+          <option value="high">🔴 Cao</option>
+          <option value="medium">🟡 Trung bình</option>
+          <option value="low">🟢 Thấp</option>
+        </select></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Ngày hết hạn *</label>
+        <input class="fi" id="dl-date" type="date"></div>
+      <div class="fg"><label>Loại</label>
+        <select class="fs" id="dl-type">
+          <option>Bài tập</option><option>Bài thi</option><option>Dự án</option>
+          <option>Báo cáo</option><option>Thuyết trình</option><option>Khác</option>
+        </select></div>
+    </div>
+    <div class="fg"><label>Ghi chú</label>
+      <textarea class="fi" id="dl-note" placeholder="Ghi chú thêm..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-dl')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveDL()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Class Modal -->
+<div class="overlay" id="modal-class">
+  <div class="modal">
+    <div class="modal-title">📅 <span id="modal-class-title">Thêm lớp học</span></div>
+    <input type="hidden" id="class-edit-id">
+    <div class="fg"><label>Tên môn học *</label>
+      <input class="fi" id="class-name" placeholder="VD: Giải tích 2"></div>
+    <div class="form-row">
+      <div class="fg"><label>Thứ</label>
+        <select class="fs" id="class-day">
+          <option>T2</option><option>T3</option><option>T4</option>
+          <option>T5</option><option>T6</option><option>T7</option><option>CN</option>
+        </select></div>
+      <div class="fg"><label>Bắt đầu</label>
+        <input class="fi" id="class-start" type="time" value="07:30"></div>
+      <div class="fg"><label>Kết thúc</label>
+        <input class="fi" id="class-end" type="time" value="09:15"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Phòng học</label>
+        <input class="fi" id="class-room" placeholder="H1.201"></div>
+      <div class="fg"><label>Giáo viên</label>
+        <input class="fi" id="class-teacher" placeholder="Tên giảng viên"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Loại buổi học</label>
+        <select class="fs" id="class-type">
+          <option>Lý thuyết</option><option>Thực hành</option><option>Bài tập</option>
+          <option>Seminar</option><option>Tự học</option>
+        </select></div>
+      <div class="fg"><label>Màu</label>
+        <select class="fs" id="class-color">
+          <option value="#7c6af7">🟣 Tím</option>
+          <option value="#2dd4bf">🩵 Teal</option>
+          <option value="#f472b6">🩷 Hồng</option>
+          <option value="#fbbf24">🟡 Vàng</option>
+          <option value="#34d399">🟢 Xanh lá</option>
+          <option value="#f87171">🔴 Đỏ</option>
+        </select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-class')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveClass()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Goal Modal -->
+<div class="overlay" id="modal-goal">
+  <div class="modal">
+    <div class="modal-title">🏆 <span id="modal-goal-title">Thêm mục tiêu</span></div>
+    <input type="hidden" id="goal-edit-id">
+    <div class="form-row">
+      <div class="fg" style="max-width:80px"><label>Icon</label>
+        <input class="fi" id="goal-emoji" value="🎯" style="font-size:20px;text-align:center"></div>
+      <div class="fg"><label>Tên mục tiêu *</label>
+        <input class="fi" id="goal-title" placeholder="VD: Đạt GPA 3.5+"></div>
+    </div>
+    <div class="fg"><label>Mô tả chi tiết</label>
+      <textarea class="fi" id="goal-desc" placeholder="Mô tả cách bạn đạt mục tiêu này..."></textarea></div>
+    <div class="form-row">
+      <div class="fg"><label>Tiến độ hiện tại (%)</label>
+        <input class="fi" id="goal-progress" type="number" min="0" max="100" value="0"></div>
+      <div class="fg"><label>Deadline</label>
+        <input class="fi" id="goal-deadline" type="date"></div>
+    </div>
+    <div class="fg"><label>Trạng thái</label>
+      <select class="fs" id="goal-status">
+        <option value="active">🟣 Đang thực hiện</option>
+        <option value="done">✅ Hoàn thành</option>
+        <option value="paused">⏸ Tạm dừng</option>
+      </select></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-goal')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveGoal()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Note Modal -->
+<div class="overlay" id="modal-note">
+  <div class="modal">
+    <div class="modal-title">📝 <span id="modal-note-title">Ghi chú mới</span></div>
+    <input type="hidden" id="note-edit-id">
+    <div class="fg"><label>Tiêu đề *</label>
+      <input class="fi" id="note-title-inp" placeholder="Tiêu đề ghi chú"></div>
+    <div class="fg"><label>Nội dung</label>
+      <textarea class="fi" id="note-body" style="min-height:120px" placeholder="Nội dung ghi chú..."></textarea></div>
+    <div class="form-row">
+      <div class="fg"><label>Màu nền</label>
+        <select class="fs" id="note-color">
+          <option value="default">⬛ Mặc định</option>
+          <option value="purple">🟣 Tím</option>
+          <option value="teal">🩵 Teal</option>
+          <option value="pink">🩷 Hồng</option>
+          <option value="amber">🟡 Vàng</option>
+        </select></div>
+      <div class="fg"><label>Tag</label>
+        <input class="fi" id="note-tag" placeholder="VD: Giải tích, Ôn thi"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-note')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveNote()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="overlay" id="modal-profile">
+  <div class="modal">
+    <div class="modal-title">👤 Chỉnh sửa hồ sơ</div>
+    <div class="fg"><label>Họ và tên *</label>
+      <input class="fi" id="pf-inp-name" placeholder="Nguyễn Văn A"></div>
+    <div class="form-row">
+      <div class="fg"><label>MSSV</label>
+        <input class="fi" id="pf-inp-mssv" placeholder="21CNTT1234"></div>
+      <div class="fg"><label>Lớp</label>
+        <input class="fi" id="pf-inp-class" placeholder="CNTT-K22A"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Khoa / Ngành</label>
+        <input class="fi" id="pf-inp-faculty" placeholder="Công nghệ thông tin"></div>
+      <div class="fg"><label>Học kỳ hiện tại</label>
+        <select class="fs" id="pf-inp-semester">
+          <option>Học kỳ 1</option><option>Học kỳ 2</option><option>Học kỳ 3</option>
+          <option>Học kỳ Hè</option>
+        </select></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>GPA tích lũy</label>
+        <input class="fi" id="pf-inp-gpa" type="number" step="0.01" min="0" max="4" placeholder="3.20"></div>
+      <div class="fg"><label>Email</label>
+        <input class="fi" id="pf-inp-email" placeholder="abc@student.edu.vn"></div>
+    </div>
+    <div class="fg"><label>Icon avatar</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="font-size:24px;cursor:pointer" onclick="selectAvatar(this,'👤')">👤</span>
+        <span style="font-size:24px;cursor:pointer" onclick="selectAvatar(this,'🧑‍💻')">🧑‍💻</span>
+        <span style="font-size:24px;cursor:pointer" onclick="selectAvatar(this,'👩‍🎓')">👩‍🎓</span>
+        <span style="font-size:24px;cursor:pointer" onclick="selectAvatar(this,'🧑‍🎓')">🧑‍🎓</span>
+        <span style="font-size:24px;cursor:pointer" onclick="selectAvatar(this,'🦸')">🦸</span>
+        <span style="font-size:24px;cursor:pointer" onclick="selectAvatar(this,'🌟')">🌟</span>
+      </div>
+      <input type="hidden" id="pf-inp-avatar" value="👤">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-profile')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveProfile()">Lưu hồ sơ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Subject Modal -->
+<div class="overlay" id="modal-subject">
+  <div class="modal">
+    <div class="modal-title">📚 <span id="modal-subject-title">Thêm môn học</span></div>
+    <input type="hidden" id="subj-edit-id">
+    <div class="fg"><label>Tên môn học *</label>
+      <input class="fi" id="subj-name" placeholder="VD: Giải tích 2"></div>
+    <div class="form-row">
+      <div class="fg"><label>Mã môn</label>
+        <input class="fi" id="subj-code" placeholder="GT2"></div>
+      <div class="fg"><label>Số tín chỉ</label>
+        <input class="fi" id="subj-credits" type="number" min="1" max="10" value="3"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Điểm hiện tại (%)</label>
+        <input class="fi" id="subj-score" type="number" min="0" max="100" placeholder="75"></div>
+      <div class="fg"><label>Màu sắc</label>
+        <select class="fs" id="subj-color">
+          <option value="#7c6af7">🟣 Tím</option>
+          <option value="#2dd4bf">🩵 Teal</option>
+          <option value="#f472b6">🩷 Hồng</option>
+          <option value="#fbbf24">🟡 Vàng</option>
+          <option value="#34d399">🟢 Xanh lá</option>
+          <option value="#f87171">🔴 Đỏ</option>
+        </select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-subject')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveSubject()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Budget Modal -->
+<div class="overlay" id="modal-budget">
+  <div class="modal">
+    <div class="modal-title">💰 Cài đặt ngân sách tháng</div>
+    <div class="fg"><label>Tổng ngân sách tháng (₫)</label>
+      <input class="fi" id="budget-total" type="number" placeholder="2000000"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fg"><label>🍜 Ăn uống</label><input class="fi" id="budget-food" type="number" placeholder="800000"></div>
+      <div class="fg"><label>🚌 Di chuyển</label><input class="fi" id="budget-transport" type="number" placeholder="300000"></div>
+      <div class="fg"><label>📚 Học tập</label><input class="fi" id="budget-study" type="number" placeholder="400000"></div>
+      <div class="fg"><label>🎮 Giải trí</label><input class="fi" id="budget-entertainment" type="number" placeholder="200000"></div>
+      <div class="fg"><label>💊 Sức khỏe</label><input class="fi" id="budget-health" type="number" placeholder="200000"></div>
+      <div class="fg"><label>👕 Quần áo</label><input class="fi" id="budget-clothing" type="number" placeholder="200000"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-budget')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveBudget()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  STORAGE LAYER
+// ═══════════════════════════════════════════
+const KEYS = {
+  deadlines:'sl_deadlines',schedule:'sl_schedule',expenses:'sl_expenses',
+  goals:'sl_goals',notes:'sl_notes',sessions:'sl_sessions',
+  profile:'sl_profile',subjects:'sl_subjects',budget:'sl_budget',
+  focusData:'sl_focus',currentDay:'sl_curday'
+};
+
+function load(key,def){
+  try{ const v=localStorage.getItem(key); return v?JSON.parse(v):def; }
+  catch(e){ return def; }
+}
+function save(key,val){
+  try{ localStorage.setItem(key,JSON.stringify(val)); showSaved(); }
+  catch(e){ console.error(e); }
+}
+function showSaved(){
+  const el=document.getElementById('save-ind');
+  el.style.display='block';
+  clearTimeout(window._saveT);
+  window._saveT=setTimeout(()=>el.style.display='none',2000);
+}
+
+// ═══════════════════════════════════════════
+//  DEFAULT DATA
+// ═══════════════════════════════════════════
+function initDefaults(){
+  if(!localStorage.getItem(KEYS.subjects)){
+    save(KEYS.subjects,[
+      {id:1,name:'Giải tích 2',code:'GT2',credits:3,score:75,color:'#7c6af7'},
+      {id:2,name:'Lập trình OOP',code:'OOP',credits:3,score:68,color:'#f472b6'},
+      {id:3,name:'Cơ sở dữ liệu',code:'CSDL',credits:3,score:82,color:'#34d399'},
+      {id:4,name:'Mạng máy tính',code:'MMT',credits:3,score:55,color:'#2dd4bf'},
+      {id:5,name:'Anh văn CN',code:'AVCN',credits:2,score:90,color:'#fbbf24'},
+    ]);
+  }
+  if(!localStorage.getItem(KEYS.schedule)){
+    save(KEYS.schedule,[
+      {id:1,name:'Giải tích 2',day:'T2',start:'07:30',end:'09:15',room:'H1.201',teacher:'Trần Minh Khoa',type:'Lý thuyết',color:'#7c6af7'},
+      {id:2,name:'Lập trình OOP',day:'T2',start:'09:30',end:'11:15',room:'Lab B3',teacher:'Lê Văn Hùng',type:'Thực hành',color:'#f472b6'},
+      {id:3,name:'Cơ sở dữ liệu',day:'T2',start:'13:00',end:'14:45',room:'H2.303',teacher:'Nguyễn Thị Mai',type:'Lý thuyết',color:'#34d399'},
+      {id:4,name:'Mạng máy tính',day:'T3',start:'07:30',end:'09:15',room:'H3.102',teacher:'Phạm Quốc Dũng',type:'Lý thuyết',color:'#2dd4bf'},
+      {id:5,name:'Giải tích 2',day:'T3',start:'13:00',end:'14:45',room:'H1.201',teacher:'Trần Minh Khoa',type:'Bài tập',color:'#7c6af7'},
+      {id:6,name:'Lập trình OOP',day:'T4',start:'07:30',end:'11:15',room:'Lab B3',teacher:'Lê Văn Hùng',type:'Thực hành',color:'#f472b6'},
+      {id:7,name:'Cơ sở dữ liệu',day:'T4',start:'13:00',end:'14:45',room:'Lab C2',teacher:'Nguyễn Thị Mai',type:'Thực hành',color:'#34d399'},
+      {id:8,name:'Giải tích 2',day:'T5',start:'07:30',end:'09:15',room:'H1.201',teacher:'Trần Minh Khoa',type:'Lý thuyết',color:'#7c6af7'},
+      {id:9,name:'Anh văn CN',day:'T5',start:'13:00',end:'14:45',room:'E4.101',teacher:'Smith Johnson',type:'Lý thuyết',color:'#fbbf24'},
+      {id:10,name:'Lập trình OOP',day:'T6',start:'07:30',end:'09:15',room:'H2.201',teacher:'Lê Văn Hùng',type:'Lý thuyết',color:'#f472b6'},
+    ]);
+  }
+  if(!localStorage.getItem(KEYS.deadlines)){
+    const n=new Date();
+    const d=(off)=>{const x=new Date(n);x.setDate(x.getDate()+off);return x.toISOString().split('T')[0];};
+    save(KEYS.deadlines,[
+      {id:1,name:'Bài tập lớn Lập trình OOP',subject:'Lập trình OOP',priority:'high',date:d(2),type:'Dự án',note:'Làm app quản lý sinh viên',done:false},
+      {id:2,name:'Báo cáo CSDL - ERD diagram',subject:'Cơ sở dữ liệu',priority:'high',date:d(4),type:'Báo cáo',note:'Thiết kế ERD cho hệ thống bán hàng',done:false},
+      {id:3,name:'Bài tập Giải tích 2 Ch.5',subject:'Giải tích 2',priority:'medium',date:d(7),type:'Bài tập',note:'',done:false},
+      {id:4,name:'Essay Anh văn chuyên ngành',subject:'Anh văn CN',priority:'medium',date:d(10),type:'Báo cáo',note:'500 từ về AI trong giáo dục',done:false},
+      {id:5,name:'Lab Mạng - Cấu hình router',subject:'Mạng máy tính',priority:'low',date:d(18),type:'Thực hành',note:'',done:true},
+    ]);
+  }
+  if(!localStorage.getItem(KEYS.goals)){
+    save(KEYS.goals,[
+      {id:1,emoji:'🎓',title:'Đạt GPA 3.5+',desc:'Học đều đặn, hoàn thành đúng deadline các môn',progress:68,status:'active',deadline:'2026-05-30'},
+      {id:2,emoji:'💪',title:'Luyện IELTS 6.5',desc:'Luyện nghe-nói 30p/ngày, học 500 từ vựng',progress:45,status:'active',deadline:'2026-08-01'},
+      {id:3,emoji:'💻',title:'Hoàn thành dự án web',desc:'Xây dựng portfolio với React + Node.js',progress:80,status:'active',deadline:'2026-04-15'},
+      {id:4,emoji:'💰',title:'Tiết kiệm 5 triệu',desc:'Tiết kiệm 1 triệu/tháng trong 5 tháng',progress:60,status:'active',deadline:'2026-07-01'},
+      {id:5,emoji:'📚',title:'Đọc 12 cuốn sách',desc:'Mỗi tháng ít nhất 1 cuốn sách hay',progress:100,status:'done',deadline:'2026-12-31'},
+    ]);
+  }
+  if(!localStorage.getItem(KEYS.expenses)){
+    save(KEYS.expenses,[
+      {id:1,name:'Cơm trưa',cat:'food',amount:-35000,date:'2026-03-08',note:''},
+      {id:2,name:'Xe buýt',cat:'transport',amount:-8000,date:'2026-03-08',note:''},
+      {id:3,name:'In tài liệu',cat:'study',amount:-25000,date:'2026-03-07',note:''},
+      {id:4,name:'Học bổng tháng 3',cat:'other',amount:500000,date:'2026-03-05',note:''},
+      {id:5,name:'Game Steam',cat:'entertainment',amount:-80000,date:'2026-03-04',note:''},
+      {id:6,name:'Sách giáo trình',cat:'study',amount:-120000,date:'2026-03-03',note:''},
+    ]);
+  }
+  if(!localStorage.getItem(KEYS.notes)){
+    save(KEYS.notes,[
+      {id:1,title:'Công thức Giải tích',body:'d/dx(sin x) = cos x\nd/dx(cos x) = -sin x\nd/dx(tan x) = sec²x\n∫sin x dx = -cos x + C',color:'purple',tag:'Giải tích',date:'2026-03-07'},
+      {id:2,title:'Thuật toán sắp xếp',body:'Bubble Sort: O(n²)\nQuick Sort: O(n log n) tb\nMerge Sort: O(n log n)\nHeap Sort: O(n log n)',color:'teal',tag:'OOP',date:'2026-03-06'},
+      {id:3,title:'Kế hoạch ôn thi giữa kỳ',body:'Tuần 1: Ôn Giải tích ch.1-3\nTuần 2: OOP patterns\nTuần 3: CSDL SQL\nTuần 4: Review tổng hợp',color:'amber',tag:'Kế hoạch',date:'2026-03-05'},
+    ]);
+  }
+  if(!localStorage.getItem(KEYS.budget)){
+    save(KEYS.budget,{total:2000000,food:800000,transport:300000,study:400000,entertainment:200000,health:150000,clothing:150000});
+  }
+  if(!localStorage.getItem(KEYS.profile)){
+    save(KEYS.profile,{name:'Sinh viên',mssv:'',classname:'',faculty:'CNTT',semester:'Học kỳ 2',gpa:'',email:'',avatar:'👤'});
+  }
+  if(!localStorage.getItem(KEYS.sessions)){save(KEYS.sessions,[]);}
+  if(!localStorage.getItem(KEYS.focusData)){save(KEYS.focusData,{pomodoros:0,totalMin:0,streak:0,lastDate:''});}
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+const pageInfo={
+  dashboard:{title:'Dashboard',sub:'Tổng quan học kỳ của bạn 📊',action:''},
+  schedule:{title:'Thời khóa biểu',sub:'Lịch học theo tuần',action:'+ Thêm lớp'},
+  deadlines:{title:'Deadline & Bài tập',sub:'Quản lý và theo dõi deadline',action:'+ Thêm deadline'},
+  tracker:{title:'Study Tracker',sub:'Theo dõi thời gian học tập',action:''},
+  focus:{title:'Focus Mode',sub:'Tập trung với Pomodoro technique 🍅',action:''},
+  notes:{title:'Ghi chú',sub:'Lưu nhanh kiến thức và ý tưởng',action:'+ Ghi chú mới'},
+  expense:{title:'Quản lý chi tiêu',sub:'Theo dõi ngân sách tháng',action:''},
+  goals:{title:'Mục tiêu cá nhân',sub:'Đặt và theo dõi mục tiêu',action:'+ Mục tiêu mới'},
+  stats:{title:'Thống kê & Báo cáo',sub:'Phân tích tổng hợp học kỳ 2',action:'📥 Xuất báo cáo'},
+  profile:{title:'Hồ sơ & Cài đặt',sub:'Thông tin cá nhân và cấu hình ứng dụng',action:'✏️ Chỉnh sửa'},
+};
+
+let curPage='dashboard';
+function nav(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(x=>{
+    if(x.getAttribute('onclick')===`nav('${p}')`) x.classList.add('active');
+  });
+  const info=pageInfo[p];
+  document.getElementById('pt').textContent=info.title;
+  document.getElementById('ps').textContent=info.sub;
+  const btn=document.getElementById('action-btn');
+  btn.style.display=info.action?'block':'none';
+  btn.textContent=info.action;
+  document.getElementById('main-scroll').scrollTop=0;
+  curPage=p;
+  renderPage(p);
+}
+
+function handleAction(){
+  if(curPage==='schedule') openModal('modal-class');
+  else if(curPage==='deadlines'){resetDLForm();openModal('modal-dl');}
+  else if(curPage==='notes'){resetNoteForm();openModal('modal-note');}
+  else if(curPage==='goals'){resetGoalForm();openModal('modal-goal');}
+  else if(curPage==='profile') openModal('modal-profile');
+  else if(curPage==='stats') exportData();
+}
+
+function renderPage(p){
+  const fn={
+    dashboard:renderDash,schedule:renderSchedule,deadlines:renderDL,
+    tracker:renderTracker,focus:renderFocus,notes:renderNotes,
+    expense:renderExpenses,goals:renderGoals,stats:renderStats,profile:renderProfile
+  };
+  if(fn[p]) fn[p]();
+}
+
+// ═══════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
+});
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+let toastEl=null,toastT=null;
+function toast(msg,type='info'){
+  if(toastEl){toastEl.remove();clearTimeout(toastT);}
+  toastEl=document.createElement('div');
+  toastEl.className='toast';
+  toastEl.innerHTML=msg;
+  toastEl.style.borderColor=type==='error'?'var(--red)':type==='success'?'var(--green)':'var(--border2)';
+  document.body.appendChild(toastEl);
+  toastT=setTimeout(()=>{if(toastEl){toastEl.style.opacity='0';setTimeout(()=>{if(toastEl)toastEl.remove();toastEl=null;},300);}},2800);
+}
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+function uid(){return Date.now()+Math.random().toString(36).slice(2,6);}
+function fmtMoney(n){return Math.abs(n).toLocaleString('vi-VN')+'₫';}
+function daysFromNow(dateStr){return Math.ceil((new Date(dateStr)-new Date())/(86400000));}
+function fmtDate(dateStr){const d=new Date(dateStr);return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}`;}
+function curMonth(){const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;}
+const catInfo={
+  food:{emoji:'🍜',label:'Ăn uống',color:'#fbbf24'},
+  transport:{emoji:'🚌',label:'Di chuyển',color:'#2dd4bf'},
+  study:{emoji:'📚',label:'Học tập',color:'#7c6af7'},
+  entertainment:{emoji:'🎮',label:'Giải trí',color:'#f472b6'},
+  health:{emoji:'💊',label:'Sức khỏe',color:'#34d399'},
+  clothing:{emoji:'👕',label:'Quần áo',color:'#f87171'},
+  other:{emoji:'📦',label:'Khác',color:'#8888b0'},
+};
+
+// ═══════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════
+function renderDash(){
+  const deadlines=load(KEYS.deadlines,[]);
+  const sessions=load(KEYS.sessions,[]);
+  const expenses=load(KEYS.expenses,[]);
+  const goals=load(KEYS.goals,[]);
+  const subjects=load(KEYS.subjects,[]);
+
+  const todayMin=sessions.filter(s=>{
+    const d=new Date(s.endTime||0);
+    return d.toDateString()===new Date().toDateString();
+  }).reduce((a,s)=>a+s.duration,0);
+
+  const spentThisMonth=expenses.filter(e=>e.date.startsWith(curMonth())&&e.amount<0).reduce((a,e)=>a+Math.abs(e.amount),0);
+  const budget=load(KEYS.budget,{total:2000000});
+  const doneGoals=goals.filter(g=>g.status==='done').length;
+  const pendingDL=deadlines.filter(d=>!d.done).length;
+
+  document.getElementById('dl-badge').textContent=pendingDL;
+
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="stat-card" style="--stat-color:var(--accent)">
+      <div class="stat-icon">📚</div>
+      <div class="stat-val">${Math.round(todayMin/60*10)/10}h</div>
+      <div class="stat-lbl">Học hôm nay</div>
+      <div class="stat-chg">📅 Tháng này: ${Math.round(sessions.filter(s=>s.endTime&&s.endTime.startsWith(curMonth())).reduce((a,s)=>a+s.duration,0)/60)}h</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--pink)">
+      <div class="stat-icon">⏰</div>
+      <div class="stat-val">${pendingDL}</div>
+      <div class="stat-lbl">Deadline còn lại</div>
+      <div class="stat-chg" style="color:${deadlines.filter(d=>!d.done&&daysFromNow(d.date)<=3).length>0?'var(--red)':'var(--green)'}">
+        ${deadlines.filter(d=>!d.done&&daysFromNow(d.date)<=3).length} deadline khẩn cấp
+      </div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--green)">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-val">${doneGoals}/${goals.length}</div>
+      <div class="stat-lbl">Mục tiêu hoàn thành</div>
+      <div class="stat-chg">📈 ${goals.length?Math.round(doneGoals/goals.length*100):0}% tổng tiến độ</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--amber)">
+      <div class="stat-icon">💰</div>
+      <div class="stat-val">${Math.round(spentThisMonth/1000)}K</div>
+      <div class="stat-lbl">Chi tiêu tháng này</div>
+      <div class="stat-chg" style="color:${spentThisMonth>budget.total?'var(--red)':'var(--green)'}">
+        Còn lại: ${Math.round((budget.total-spentThisMonth)/1000)}K / ${Math.round(budget.total/1000)}K
+      </div>
+    </div>
+  `;
+
+  // Today schedule
+  const days=['T2','T3','T4','T5','T6','T7','CN'];
+  const dow=new Date().getDay();
+  const todayDay=days[dow===0?6:dow-1];
+  const sched=load(KEYS.schedule,[]).filter(c=>c.day===todayDay).sort((a,b)=>a.start.localeCompare(b.start));
+  const todayEl=document.getElementById('dash-today');
+  if(!sched.length){
+    todayEl.innerHTML=`<div class="empty"><div class="empty-icon">🎉</div><p>Hôm nay không có lớp học!</p></div>`;
+  } else {
+    todayEl.innerHTML=sched.map(c=>`
+      <div class="dash-schedule-item">
+        <div class="dsi-time">${c.start}</div>
+        <div class="dsi-bar" style="background:${c.color}"></div>
+        <div class="dsi-info">
+          <div class="dsi-name">${c.name}</div>
+          <div class="dsi-sub">🏫 ${c.room||'-'} · ${c.type}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Upcoming deadlines
+  const upcoming=deadlines.filter(d=>!d.done).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5);
+  const dlEl=document.getElementById('dash-dl');
+  if(!upcoming.length){
+    dlEl.innerHTML=`<div class="empty"><div class="empty-icon">✅</div><p>Không có deadline nào!</p></div>`;
+  } else {
+    dlEl.innerHTML=upcoming.map(d=>{
+      const days2=daysFromNow(d.date);
+      const col=d.priority==='high'?'var(--red)':d.priority==='medium'?'var(--amber)':'var(--green)';
+      const dcls=days2<=0?'tag-red':days2<=3?'tag-red':days2<=7?'tag-amber':'tag-green';
+      const dtxt=days2<=0?'Hôm nay!':days2===1?'Ngày mai':`${days2} ngày`;
+      return `<div class="dash-dl-item">
+        <div class="ddi-dot" style="background:${col}"></div>
+        <div class="ddi-name">${d.name}</div>
+        <span class="tag ${dcls} ddi-days">${dtxt}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Progress
+  const progEl=document.getElementById('dash-progress');
+  progEl.innerHTML=subjects.map(s=>`
+    <div class="prog-wrap">
+      <div class="prog-row"><span>${s.name}</span><span style="color:${s.color};font-weight:700">${s.score||0}%</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${s.score||0}%;background:${s.color}"></div></div>
+    </div>`).join('');
+
+  // Goals
+  const gEl=document.getElementById('dash-goals');
+  const activeGoals=goals.filter(g=>g.status==='active').slice(0,4);
+  gEl.innerHTML=activeGoals.map(g=>`
+    <div class="prog-wrap">
+      <div class="prog-row"><span>${g.emoji} ${g.title}</span><span style="font-weight:700">${g.progress}%</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${g.progress}%;background:${g.progress>=100?'var(--green)':g.progress>=60?'var(--accent)':'var(--amber)'}"></div></div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  SCHEDULE
+// ═══════════════════════════════════════════
+let schedDay=load(KEYS.currentDay,'T2');
+const DAYS=['T2','T3','T4','T5','T6','T7','CN'];
+
+function renderSchedule(){
+  const tabs=document.getElementById('day-tabs');
+  tabs.innerHTML=DAYS.map(d=>`<div class="day-tab ${d===schedDay?'active':''}" onclick="setSchedDay('${d}')">${d}</div>`).join('');
+  renderDayClasses();
+}
+
+function setSchedDay(d){
+  schedDay=d;
+  save(KEYS.currentDay,d);
+  renderSchedule();
+}
+
+function renderDayClasses(){
+  const title=document.getElementById('sched-day-title');
+  const fullNames={'T2':'Thứ Hai','T3':'Thứ Ba','T4':'Thứ Tư','T5':'Thứ Năm','T6':'Thứ Sáu','T7':'Thứ Bảy','CN':'Chủ Nhật'};
+  title.textContent=`${fullNames[schedDay]} — ${load(KEYS.schedule,[]).filter(c=>c.day===schedDay).length} tiết`;
+  const sched=load(KEYS.schedule,[]).filter(c=>c.day===schedDay).sort((a,b)=>a.start.localeCompare(b.start));
+  const el=document.getElementById('sched-list');
+  if(!sched.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">🎉</div><p>Ngày trống — không có lớp học!</p></div>`;
+    return;
+  }
+  el.innerHTML=sched.map(c=>`
+    <div class="class-item" style="border-left-color:${c.color}">
+      <div class="ci-time">${c.start}–${c.end}</div>
+      <div class="ci-body">
+        <div class="ci-name">${c.name}</div>
+        <div class="ci-meta">🏫 ${c.room||'-'} · 👨‍🏫 ${c.teacher||'-'} · <span class="tag tag-purple">${c.type}</span></div>
+      </div>
+      <div class="ci-actions">
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="editClass(${c.id})">✏️</button>
+        <button class="btn btn-danger btn-icon btn-sm" onclick="deleteClass(${c.id})">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function openClassModal(){
+  document.getElementById('modal-class-title').textContent='Thêm lớp học';
+  document.getElementById('class-edit-id').value='';
+  document.getElementById('class-name').value='';
+  document.getElementById('class-day').value=schedDay;
+  document.getElementById('class-start').value='07:30';
+  document.getElementById('class-end').value='09:15';
+  document.getElementById('class-room').value='';
+  document.getElementById('class-teacher').value='';
+  openModal('modal-class');
+}
+
+function editClass(id){
+  const c=load(KEYS.schedule,[]).find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('modal-class-title').textContent='Chỉnh sửa lớp học';
+  document.getElementById('class-edit-id').value=id;
+  document.getElementById('class-name').value=c.name;
+  document.getElementById('class-day').value=c.day;
+  document.getElementById('class-start').value=c.start;
+  document.getElementById('class-end').value=c.end;
+  document.getElementById('class-room').value=c.room||'';
+  document.getElementById('class-teacher').value=c.teacher||'';
+  document.getElementById('class-type').value=c.type||'Lý thuyết';
+  document.getElementById('class-color').value=c.color||'#7c6af7';
+  openModal('modal-class');
+}
+
+function saveClass(){
+  const name=document.getElementById('class-name').value.trim();
+  if(!name){toast('❌ Vui lòng nhập tên môn học!','error');return;}
+  const id=document.getElementById('class-edit-id').value;
+  const item={
+    id:id?Number(id):Date.now(),
+    name,
+    day:document.getElementById('class-day').value,
+    start:document.getElementById('class-start').value,
+    end:document.getElementById('class-end').value,
+    room:document.getElementById('class-room').value,
+    teacher:document.getElementById('class-teacher').value,
+    type:document.getElementById('class-type').value,
+    color:document.getElementById('class-color').value,
+  };
+  let sched=load(KEYS.schedule,[]);
+  if(id) sched=sched.map(x=>x.id===item.id?item:x);
+  else sched.push(item);
+  save(KEYS.schedule,sched);
+  closeModal('modal-class');
+  schedDay=item.day;
+  renderSchedule();
+  toast('✅ Đã lưu lớp học!','success');
+}
+
+function deleteClass(id){
+  if(!confirm('Xóa lớp học này?')) return;
+  save(KEYS.schedule,load(KEYS.schedule,[]).filter(x=>x.id!==id));
+  renderSchedule();
+  toast('🗑 Đã xóa lớp học');
+}
+
+// ═══════════════════════════════════════════
+//  DEADLINES
+// ═══════════════════════════════════════════
+let dlFilterMode='all';
+
+function populateDLSubjects(){
+  const sel=document.getElementById('dl-subject');
+  const subjects=load(KEYS.subjects,[]);
+  sel.innerHTML=subjects.map(s=>`<option>${s.name}</option>`).join('');
+}
+
+function resetDLForm(){
+  document.getElementById('modal-dl-title').textContent='Thêm Deadline';
+  document.getElementById('dl-edit-id').value='';
+  document.getElementById('dl-name').value='';
+  document.getElementById('dl-note').value='';
+  const n=new Date();n.setDate(n.getDate()+7);
+  document.getElementById('dl-date').value=n.toISOString().split('T')[0];
+  document.getElementById('dl-priority').value='medium';
+  populateDLSubjects();
+}
+
+function editDL(id){
+  const d=load(KEYS.deadlines,[]).find(x=>x.id===id);
+  if(!d) return;
+  populateDLSubjects();
+  document.getElementById('modal-dl-title').textContent='Chỉnh sửa Deadline';
+  document.getElementById('dl-edit-id').value=id;
+  document.getElementById('dl-name').value=d.name;
+  document.getElementById('dl-date').value=d.date;
+  document.getElementById('dl-priority').value=d.priority;
+  document.getElementById('dl-type').value=d.type||'Bài tập';
+  document.getElementById('dl-note').value=d.note||'';
+  document.getElementById('dl-subject').value=d.subject||'';
+  openModal('modal-dl');
+}
+
+function saveDL(){
+  const name=document.getElementById('dl-name').value.trim();
+  const date=document.getElementById('dl-date').value;
+  if(!name||!date){toast('❌ Vui lòng điền tên và ngày!','error');return;}
+  const id=document.getElementById('dl-edit-id').value;
+  const item={
+    id:id?Number(id):Date.now(),
+    name,date,
+    subject:document.getElementById('dl-subject').value,
+    priority:document.getElementById('dl-priority').value,
+    type:document.getElementById('dl-type').value,
+    note:document.getElementById('dl-note').value,
+    done:false,
+  };
+  let dls=load(KEYS.deadlines,[]);
+  if(id) item.done=dls.find(x=>x.id===item.id)?.done||false, dls=dls.map(x=>x.id===item.id?item:x);
+  else dls.unshift(item);
+  save(KEYS.deadlines,dls);
+  closeModal('modal-dl');
+  renderDL();
+  toast('✅ Đã lưu deadline!','success');
+}
+
+function deleteDL(id){
+  if(!confirm('Xóa deadline này?')) return;
+  save(KEYS.deadlines,load(KEYS.deadlines,[]).filter(x=>x.id!==id));
+  renderDL();
+  toast('🗑 Đã xóa deadline');
+}
+
+function toggleDL(id){
+  let dls=load(KEYS.deadlines,[]);
+  const dl=dls.find(x=>x.id===id);
+  if(dl){dl.done=!dl.done;save(KEYS.deadlines,dls);renderDL();
+    toast(dl.done?'✅ Hoàn thành deadline!':'↩ Đã đánh dấu chưa xong');}
+}
+
+function dlFilter(btn,mode){
+  document.querySelectorAll('.dl-filter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  dlFilterMode=mode;
+  renderDL();
+}
+
+function renderDL(){
+  let dls=load(KEYS.deadlines,[]);
+  if(dlFilterMode==='urgent') dls=dls.filter(d=>!d.done&&daysFromNow(d.date)<=3);
+  else if(dlFilterMode==='week') dls=dls.filter(d=>!d.done&&daysFromNow(d.date)<=7);
+  else if(dlFilterMode==='pending') dls=dls.filter(d=>!d.done);
+  else if(dlFilterMode==='done') dls=dls.filter(d=>d.done);
+  dls.sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  const el=document.getElementById('dl-list');
+  document.getElementById('dl-badge').textContent=load(KEYS.deadlines,[]).filter(d=>!d.done).length;
+
+  if(!dls.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">✅</div><p>Không có deadline nào trong mục này!</p></div>`;
+    return;
+  }
+  el.innerHTML=dls.map(d=>{
+    const days2=daysFromNow(d.date);
+    const col=d.priority==='high'?'var(--red)':d.priority==='medium'?'var(--amber)':'var(--green)';
+    const dcls=d.done?'tag-green':days2<=0?'tag-red':days2<=3?'tag-red':days2<=7?'tag-amber':'tag-teal';
+    const dtxt=d.done?'✓ Xong':days2<=0?'Hôm nay!':days2===1?'Ngày mai':`${days2} ngày`;
+    const dcolor=d.done?'var(--green)':days2<=3?'var(--red)':days2<=7?'var(--amber)':'var(--text3)';
+    return `<div class="dl-item ${d.done?'done':''}">
+      <div class="dl-check ${d.done?'on':''}" onclick="toggleDL(${d.id})">${d.done?'✓':''}</div>
+      <div class="dl-dot" style="background:${col}"></div>
+      <div class="dl-body">
+        <div class="dl-name">${d.name}</div>
+        <div class="dl-sub">📚 ${d.subject} · ${d.type||'Bài tập'} ${d.note?'· '+d.note:''}</div>
+      </div>
+      <div class="dl-right">
+        <div class="dl-date">${fmtDate(d.date)}</div>
+        <div class="dl-rem" style="color:${dcolor}">${dtxt}</div>
+      </div>
+      <div class="dl-actions">
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="editDL(${d.id})">✏️</button>
+        <button class="btn btn-danger btn-icon btn-sm" onclick="deleteDL(${d.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  TRACKER
+// ═══════════════════════════════════════════
+let trRunning=false,trSec=0,trInterval=null,trSubject='';
+
+function renderTracker(){
+  const subjects=load(KEYS.subjects,[]);
+  const sel=document.getElementById('tr-subject');
+  sel.innerHTML=`<option value="">-- Chọn môn học --</option>`+subjects.map(s=>`<option value="${s.name}">${s.name}</option>`).join('');
+  if(trSubject) sel.value=trSubject;
+
+  const sessions=load(KEYS.sessions,[]);
+  const now=new Date();
+  const todayMin=sessions.filter(s=>{
+    const d=new Date(s.endTime||0);
+    return d.toDateString()===now.toDateString();
+  }).reduce((a,s)=>a+(s.duration||0),0);
+
+  const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());
+  const weekMin=sessions.filter(s=>{
+    const d=new Date(s.endTime||0);return d>=weekStart;
+  }).reduce((a,s)=>a+(s.duration||0),0);
+
+  document.getElementById('tr-today').textContent=`${todayMin}p`;
+  document.getElementById('tr-week').textContent=`${Math.round(weekMin/60*10)/10}h`;
+  const allMin=sessions.reduce((a,s)=>a+(s.duration||0),0);
+  document.getElementById('tr-total').textContent=`${Math.round(allMin/60*10)/10}h`;
+
+  // Subject bars
+  const bySubj={};
+  subjects.forEach(s=>{bySubj[s.name]=0;});
+  sessions.forEach(s=>{if(s.subject)bySubj[s.subject]=(bySubj[s.subject]||0)+s.duration;});
+  const maxMin=Math.max(...Object.values(bySubj),1);
+  document.getElementById('tr-subject-bars').innerHTML=subjects.map(s=>`
+    <div class="prog-wrap">
+      <div class="prog-row"><span style="font-size:13px">${s.name}</span>
+        <span style="font-size:13px;color:${s.color};font-weight:700">${Math.round((bySubj[s.name]||0)/60*10)/10}h</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${Math.round((bySubj[s.name]||0)/maxMin*100)}%;background:${s.color}"></div></div>
+    </div>`).join('');
+
+  // Heatmap
+  const hmEl=document.getElementById('tr-heatmap');
+  const sessionsByDate={};
+  sessions.forEach(s=>{
+    const dk=(s.endTime||'').split('T')[0];
+    if(dk) sessionsByDate[dk]=(sessionsByDate[dk]||0)+s.duration;
+  });
+  const cells=[];
+  for(let i=30;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const dk=d.toISOString().split('T')[0];
+    const min=sessionsByDate[dk]||0;
+    const lvl=min===0?'':min<30?'l1':min<60?'l2':min<120?'l3':'l4';
+    cells.push(`<div class="hm-cell ${lvl}" title="${dk}: ${min}p học"></div>`);
+  }
+  hmEl.innerHTML=cells.join('');
+
+  // Session log
+  const recent=sessions.slice(-15).reverse();
+  const logEl=document.getElementById('tr-sessions');
+  if(!recent.length){logEl.innerHTML=`<div class="empty" style="padding:24px"><div class="empty-icon">📋</div><p>Chưa có session nào</p></div>`;return;}
+  logEl.innerHTML=recent.map(s=>{
+    const d=new Date(s.endTime||0);
+    const timeStr=`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')} ${d.getDate()}/${d.getMonth()+1}`;
+    return `<div class="sl-item">
+      <span style="font-size:16px">${load(KEYS.subjects,[]).find(x=>x.name===s.subject)?.color?'📖':'📖'}</span>
+      <span class="sl-subject">${s.subject||'Tự học'}</span>
+      <span class="sl-duration">${s.duration>=60?Math.floor(s.duration/60)+'h '+(s.duration%60)+'p':s.duration+'p'}</span>
+      <span class="sl-time">${timeStr}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateTrSubject(){
+  trSubject=document.getElementById('tr-subject').value;
+  document.getElementById('tr-subj-name').textContent=trSubject||'Chưa chọn';
+}
+
+function toggleTimer(){
+  if(!trRunning){
+    trRunning=true;
+    document.getElementById('tr-btn').textContent='⏸';
+    trInterval=setInterval(()=>{
+      trSec++;
+      const h=String(Math.floor(trSec/3600)).padStart(2,'0');
+      const m=String(Math.floor((trSec%3600)/60)).padStart(2,'0');
+      const s=String(trSec%60).padStart(2,'0');
+      document.getElementById('tr-timer').textContent=`${h}:${m}:${s}`;
+    },1000);
+    toast('▶ Session bắt đầu!');
+  } else {
+    trRunning=false;
+    clearInterval(trInterval);
+    document.getElementById('tr-btn').textContent='▶';
+    toast('⏸ Đã tạm dừng');
+  }
+}
+
+function resetTimer(){
+  if(trSec>60){
+    const sessions=load(KEYS.sessions,[]);
+    sessions.push({id:Date.now(),subject:trSubject,duration:Math.floor(trSec/60),endTime:new Date().toISOString()});
+    save(KEYS.sessions,sessions);
+    toast(`✅ Đã lưu session: ${Math.floor(trSec/60)}p học${trSubject?' môn '+trSubject:''}!`,'success');
+  }
+  trRunning=false;clearInterval(trInterval);trSec=0;
+  document.getElementById('tr-timer').textContent='00:00:00';
+  document.getElementById('tr-btn').textContent='▶';
+  renderTracker();
+}
+
+function clearSessions(){
+  if(!confirm('Xóa toàn bộ lịch sử học tập?')) return;
+  save(KEYS.sessions,[]);renderTracker();toast('🗑 Đã xóa lịch sử');
+}
+
+// ═══════════════════════════════════════════
+//  FOCUS
+// ═══════════════════════════════════════════
+let focMin=25,focSec=0,focTotal=1500,focRunning=false,focInterval=null,focLabel='🍅 Pomodoro';
+
+function renderFocus(){
+  const fd=load(KEYS.focusData,{pomodoros:0,totalMin:0,streak:0});
+  document.getElementById('focus-pomo-count').textContent=fd.pomodoros||0;
+  document.getElementById('focus-total-min').textContent=(fd.totalMin||0)+'m';
+  document.getElementById('focus-streak').textContent='🔥'+(fd.streak||0);
+  updateFocusRing(0);
+}
+
+function setFocus(btn,min,lbl){
+  document.querySelectorAll('.fp-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  focMin=min;focLabel=lbl;
+  if(focRunning){clearInterval(focInterval);focRunning=false;}
+  focSec=min*60;focTotal=min*60;
+  document.getElementById('focus-display').textContent=`${String(min).padStart(2,'0')}:00`;
+  document.getElementById('focus-lbl').textContent='Nhấn để bắt đầu';
+  updateFocusRing(0);
+}
+
+function toggleFocus(){
+  if(!focRunning){
+    if(focSec<=0){focSec=focMin*60;focTotal=focMin*60;}
+    focRunning=true;
+    document.getElementById('focus-lbl').textContent='🎯 Đang tập trung...';
+    focInterval=setInterval(()=>{
+      focSec--;
+      const m=String(Math.floor(focSec/60)).padStart(2,'0');
+      const s=String(focSec%60).padStart(2,'0');
+      document.getElementById('focus-display').textContent=`${m}:${s}`;
+      updateFocusRing(1-focSec/focTotal);
+      if(focSec<=0){
+        clearInterval(focInterval);focRunning=false;
+        document.getElementById('focus-lbl').textContent='🎉 Xong! Nghỉ ngơi nào~';
+        const fd=load(KEYS.focusData,{pomodoros:0,totalMin:0,streak:0,lastDate:''});
+        const today=new Date().toDateString();
+        if(fd.lastDate!==today){fd.streak=(fd.streak||0)+1;fd.lastDate=today;}
+        fd.pomodoros=(fd.pomodoros||0)+1;fd.totalMin=(fd.totalMin||0)+focMin;
+        save(KEYS.focusData,fd);
+        document.getElementById('focus-pomo-count').textContent=fd.pomodoros;
+        document.getElementById('focus-total-min').textContent=fd.totalMin+'m';
+        document.getElementById('focus-streak').textContent='🔥'+fd.streak;
+        toast(`🎉 Hoàn thành ${focLabel}! +1 Pomodoro 🍅`,'success');
+      }
+    },1000);
+    toast('🎯 Bắt đầu tập trung!');
+  } else {
+    focRunning=false;clearInterval(focInterval);
+    document.getElementById('focus-lbl').textContent='⏸ Đã tạm dừng';
+  }
+}
+
+function updateFocusRing(pct){
+  const circ=2*Math.PI*120;
+  document.getElementById('focus-circle').style.strokeDashoffset=circ*(1-pct);
+}
+
+function selectSound(card,sound){
+  document.querySelectorAll('.sound-card').forEach(c=>c.classList.remove('active'));
+  card.classList.add('active');
+  toast(`🎵 Âm thanh: ${card.querySelector('.sound-name').textContent} (demo)`);
+}
+
+// ═══════════════════════════════════════════
+//  NOTES
+// ═══════════════════════════════════════════
+const noteColors={
+  default:{bg:'var(--surface)',border:'var(--border)'},
+  purple:{bg:'rgba(124,106,247,.12)',border:'rgba(124,106,247,.35)'},
+  teal:{bg:'rgba(45,212,191,.1)',border:'rgba(45,212,191,.35)'},
+  pink:{bg:'rgba(244,114,182,.1)',border:'rgba(244,114,182,.35)'},
+  amber:{bg:'rgba(251,191,36,.1)',border:'rgba(251,191,36,.35)'},
+};
+
+function resetNoteForm(){
+  document.getElementById('modal-note-title').textContent='Ghi chú mới';
+  document.getElementById('note-edit-id').value='';
+  document.getElementById('note-title-inp').value='';
+  document.getElementById('note-body').value='';
+  document.getElementById('note-color').value='default';
+  document.getElementById('note-tag').value='';
+}
+
+function editNote(id){
+  const n=load(KEYS.notes,[]).find(x=>x.id===id);
+  if(!n) return;
+  document.getElementById('modal-note-title').textContent='Chỉnh sửa ghi chú';
+  document.getElementById('note-edit-id').value=id;
+  document.getElementById('note-title-inp').value=n.title;
+  document.getElementById('note-body').value=n.body;
+  document.getElementById('note-color').value=n.color||'default';
+  document.getElementById('note-tag').value=n.tag||'';
+  openModal('modal-note');
+}
+
+function saveNote(){
+  const title=document.getElementById('note-title-inp').value.trim();
+  if(!title){toast('❌ Vui lòng nhập tiêu đề!','error');return;}
+  const id=document.getElementById('note-edit-id').value;
+  const item={
+    id:id?Number(id):Date.now(),title,
+    body:document.getElementById('note-body').value,
+    color:document.getElementById('note-color').value,
+    tag:document.getElementById('note-tag').value,
+    date:new Date().toISOString().split('T')[0],
+  };
+  let notes=load(KEYS.notes,[]);
+  if(id) notes=notes.map(x=>x.id===item.id?item:x);
+  else notes.unshift(item);
+  save(KEYS.notes,notes);
+  closeModal('modal-note');
+  renderNotes();
+  toast('✅ Đã lưu ghi chú!','success');
+}
+
+function deleteNote(id){
+  if(!confirm('Xóa ghi chú này?')) return;
+  save(KEYS.notes,load(KEYS.notes,[]).filter(x=>x.id!==id));
+  renderNotes();
+  toast('🗑 Đã xóa ghi chú');
+}
+
+function renderNotes(){
+  const search=(document.getElementById('note-search')?.value||'').toLowerCase();
+  let notes=load(KEYS.notes,[]);
+  if(search) notes=notes.filter(n=>n.title.toLowerCase().includes(search)||n.body.toLowerCase().includes(search));
+  document.getElementById('notes-count').textContent=`${notes.length} ghi chú`;
+  const el=document.getElementById('notes-grid');
+  if(!notes.length){
+    el.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📝</div><p>Chưa có ghi chú nào. Nhấn "+ Ghi chú mới" để bắt đầu!</p></div>`;
+    return;
+  }
+  el.innerHTML=notes.map(n=>{
+    const nc=noteColors[n.color||'default'];
+    return `<div class="note-card" style="background:${nc.bg};border-color:${nc.border}">
+      <div class="note-title">${n.title}</div>
+      <div class="note-preview">${n.body||'Không có nội dung'}</div>
+      <div class="note-footer">
+        <div>
+          <span class="note-date">${n.date||''}</span>
+          ${n.tag?`<span class="tag tag-purple" style="margin-left:6px">${n.tag}</span>`:''}
+        </div>
+        <div class="note-acts">
+          <button class="btn btn-ghost btn-icon btn-sm" onclick="editNote(${n.id})">✏️</button>
+          <button class="btn btn-danger btn-icon btn-sm" onclick="deleteNote(${n.id})">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  EXPENSE
+// ═══════════════════════════════════════════
+function renderExpenses(){
+  const expenses=load(KEYS.expenses,[]);
+  const budget=load(KEYS.budget,{total:2000000});
+
+  // Month filter options
+  const sel=document.getElementById('exp-month-filter');
+  const months=[...new Set(expenses.map(e=>e.date.slice(0,7)))].sort().reverse();
+  if(!months.includes(curMonth())) months.unshift(curMonth());
+  sel.innerHTML=months.map(m=>{
+    const [y,mo]=m.split('-');
+    return `<option value="${m}" ${m===curMonth()?'selected':''}>Tháng ${mo}/${y}</option>`;
+  }).join('');
+
+  const selMonth=sel.value||curMonth();
+  const monthExp=expenses.filter(e=>e.date.startsWith(selMonth));
+  const spent=monthExp.filter(e=>e.amount<0).reduce((a,e)=>a+Math.abs(e.amount),0);
+  const income=monthExp.filter(e=>e.amount>0).reduce((a,e)=>a+e.amount,0);
+
+  document.getElementById('exp-summary').innerHTML=`
+    <div class="exp-sum-card">
+      <div class="exp-amount" style="color:var(--pink)">${fmtMoney(spent)}</div>
+      <div class="exp-lbl">Đã chi tiêu</div>
+    </div>
+    <div class="exp-sum-card">
+      <div class="exp-amount" style="color:var(--green)">${fmtMoney(income)}</div>
+      <div class="exp-lbl">Thu nhập</div>
+    </div>
+    <div class="exp-sum-card">
+      <div class="exp-amount" style="color:${income-spent<0?'var(--red)':'var(--teal)'}">${fmtMoney(Math.abs(income-spent))}</div>
+      <div class="exp-lbl">${income-spent>=0?'Tiết kiệm được':'Bội chi'}</div>
+    </div>
+  `;
+
+  // Budget bars
+  const budgetBars=document.getElementById('exp-budget-bars');
+  const cats=['food','transport','study','entertainment','health','clothing'];
+  budgetBars.innerHTML=cats.map(cat=>{
+    const lim=budget[cat]||0;
+    const used=monthExp.filter(e=>e.cat===cat&&e.amount<0).reduce((a,e)=>a+Math.abs(e.amount),0);
+    const pct=lim?Math.min(Math.round(used/lim*100),100):0;
+    const warn=pct>=90;
+    return `<div class="budget-cat ${warn?'bc-warn':''}">
+      <div class="bc-header">
+        <span>${catInfo[cat].emoji} ${catInfo[cat].label}</span>
+        <span style="color:${warn?'var(--red)':'var(--text2)'}">${fmtMoney(used)} / ${fmtMoney(lim||0)}</span>
+      </div>
+      <div class="bc-bar"><div class="bc-fill" style="width:${pct}%;background:${warn?'var(--red)':catInfo[cat].color}"></div></div>
+    </div>`;
+  }).join('');
+
+  // List
+  const sorted=monthExp.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const listEl=document.getElementById('exp-list');
+  if(!sorted.length){
+    listEl.innerHTML=`<div class="empty"><div class="empty-icon">💸</div><p>Không có giao dịch nào tháng này</p></div>`;
+    return;
+  }
+  listEl.innerHTML=sorted.map(e=>{
+    const ci=catInfo[e.cat]||catInfo.other;
+    return `<div class="exp-item">
+      <div class="exp-cat-icon" style="background:${e.amount<0?'rgba(244,114,182,.12)':'rgba(52,211,153,.12)'}">${ci.emoji}</div>
+      <div class="exp-info">
+        <div class="exp-name">${e.name}</div>
+        <div class="exp-date">${fmtDate(e.date)} · ${ci.label}${e.note?' · '+e.note:''}</div>
+      </div>
+      <div class="exp-val ${e.amount<0?'exp-neg':'exp-pos'}">${e.amount<0?'-':'+'}${fmtMoney(e.amount)}</div>
+      <div class="exp-act">
+        <button class="btn btn-danger btn-icon btn-sm" onclick="deleteExpense(${e.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addExpense(){
+  const name=document.getElementById('exp-name').value.trim();
+  const amt=parseFloat(document.getElementById('exp-amt').value);
+  if(!name||!amt||isNaN(amt)){toast('❌ Vui lòng điền đầy đủ!','error');return;}
+  const type=document.getElementById('exp-type').value;
+  const exp=load(KEYS.expenses,[]);
+  exp.unshift({
+    id:Date.now(),name,
+    cat:document.getElementById('exp-cat').value,
+    amount:type==='expense'?-amt:amt,
+    date:new Date().toISOString().split('T')[0],
+    note:document.getElementById('exp-note').value,
+  });
+  save(KEYS.expenses,exp);
+  document.getElementById('exp-name').value='';
+  document.getElementById('exp-amt').value='';
+  document.getElementById('exp-note').value='';
+  renderExpenses();
+  toast('✅ Đã thêm giao dịch!','success');
+}
+
+function deleteExpense(id){
+  save(KEYS.expenses,load(KEYS.expenses,[]).filter(x=>x.id!==id));
+  renderExpenses();
+  toast('🗑 Đã xóa giao dịch');
+}
+
+function saveBudget(){
+  const b={
+    total:parseFloat(document.getElementById('budget-total').value)||2000000,
+    food:parseFloat(document.getElementById('budget-food').value)||0,
+    transport:parseFloat(document.getElementById('budget-transport').value)||0,
+    study:parseFloat(document.getElementById('budget-study').value)||0,
+    entertainment:parseFloat(document.getElementById('budget-entertainment').value)||0,
+    health:parseFloat(document.getElementById('budget-health').value)||0,
+    clothing:parseFloat(document.getElementById('budget-clothing').value)||0,
+  };
+  save(KEYS.budget,b);
+  closeModal('modal-budget');
+  renderExpenses();
+  toast('✅ Đã lưu ngân sách!','success');
+}
+
+function openBudgetModal(){
+  const b=load(KEYS.budget,{});
+  document.getElementById('budget-total').value=b.total||'';
+  document.getElementById('budget-food').value=b.food||'';
+  document.getElementById('budget-transport').value=b.transport||'';
+  document.getElementById('budget-study').value=b.study||'';
+  document.getElementById('budget-entertainment').value=b.entertainment||'';
+  document.getElementById('budget-health').value=b.health||'';
+  document.getElementById('budget-clothing').value=b.clothing||'';
+  openModal('modal-budget');
+}
+
+// ═══════════════════════════════════════════
+//  GOALS
+// ═══════════════════════════════════════════
+function resetGoalForm(){
+  document.getElementById('modal-goal-title').textContent='Thêm mục tiêu';
+  document.getElementById('goal-edit-id').value='';
+  document.getElementById('goal-emoji').value='🎯';
+  document.getElementById('goal-title').value='';
+  document.getElementById('goal-desc').value='';
+  document.getElementById('goal-progress').value='0';
+  document.getElementById('goal-status').value='active';
+  document.getElementById('goal-deadline').value='';
+}
+
+function editGoal(id){
+  const g=load(KEYS.goals,[]).find(x=>x.id===id);
+  if(!g) return;
+  document.getElementById('modal-goal-title').textContent='Chỉnh sửa mục tiêu';
+  document.getElementById('goal-edit-id').value=id;
+  document.getElementById('goal-emoji').value=g.emoji||'🎯';
+  document.getElementById('goal-title').value=g.title;
+  document.getElementById('goal-desc').value=g.desc||'';
+  document.getElementById('goal-progress').value=g.progress||0;
+  document.getElementById('goal-status').value=g.status||'active';
+  document.getElementById('goal-deadline').value=g.deadline||'';
+  openModal('modal-goal');
+}
+
+function saveGoal(){
+  const title=document.getElementById('goal-title').value.trim();
+  if(!title){toast('❌ Vui lòng nhập tên mục tiêu!','error');return;}
+  const id=document.getElementById('goal-edit-id').value;
+  const item={
+    id:id?Number(id):Date.now(),
+    emoji:document.getElementById('goal-emoji').value||'🎯',
+    title,
+    desc:document.getElementById('goal-desc').value,
+    progress:Math.min(100,Math.max(0,parseInt(document.getElementById('goal-progress').value)||0)),
+    status:document.getElementById('goal-status').value,
+    deadline:document.getElementById('goal-deadline').value,
+  };
+  let goals=load(KEYS.goals,[]);
+  if(id) goals=goals.map(x=>x.id===item.id?item:x);
+  else goals.unshift(item);
+  save(KEYS.goals,goals);
+  closeModal('modal-goal');
+  renderGoals();
+  toast('✅ Đã lưu mục tiêu!','success');
+}
+
+function deleteGoal(id){
+  if(!confirm('Xóa mục tiêu này?')) return;
+  save(KEYS.goals,load(KEYS.goals,[]).filter(x=>x.id!==id));
+  renderGoals();
+  toast('🗑 Đã xóa mục tiêu');
+}
+
+function renderGoals(){
+  const goals=load(KEYS.goals,[]);
+  const done=goals.filter(g=>g.status==='done').length;
+  const active=goals.filter(g=>g.status==='active').length;
+  document.getElementById('goals-summary-text').textContent=`${done} hoàn thành · ${active} đang thực hiện · ${goals.length} tổng`;
+
+  const el=document.getElementById('goals-grid');
+  if(!goals.length){
+    el.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏆</div><p>Chưa có mục tiêu nào. Hãy thêm mục tiêu đầu tiên!</p></div>`;
+    return;
+  }
+  const sMap={active:{cls:'tag-purple',lbl:'🟣 Đang thực hiện'},done:{cls:'tag-green',lbl:'✅ Hoàn thành'},paused:{cls:'tag-amber',lbl:'⏸ Tạm dừng'}};
+  el.innerHTML=goals.map(g=>{
+    const s=sMap[g.status]||sMap.active;
+    const pCol=g.progress>=100?'var(--green)':g.progress>=60?'var(--accent)':'var(--amber)';
+    const daysLeft=g.deadline?daysFromNow(g.deadline):null;
+    return `<div class="goal-card">
+      <div class="goal-top">
+        <div class="goal-emoji">${g.emoji}</div>
+        <span class="tag ${s.cls}">${s.lbl}</span>
+      </div>
+      <div class="goal-title">${g.title}</div>
+      <div class="goal-desc">${g.desc||'Không có mô tả'}</div>
+      <div class="goal-pct" style="color:${pCol}">${g.progress}%</div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${g.progress}%;background:${pCol}"></div></div>
+      ${g.deadline?`<div class="goal-deadline">📅 ${g.deadline} ${daysLeft!==null?'· '+(daysLeft<=0?'Đã qua hạn':daysLeft+' ngày còn lại'):''}</div>`:''}
+      <div class="goal-actions">
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="editGoal(${g.id})">✏️</button>
+        <button class="btn btn-danger btn-icon btn-sm" onclick="deleteGoal(${g.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════
+function renderStats(){
+  const sessions=load(KEYS.sessions,[]);
+  const expenses=load(KEYS.expenses,[]);
+  const deadlines=load(KEYS.deadlines,[]);
+  const focusData=load(KEYS.focusData,{});
+
+  // Weekly chart
+  const days=['T2','T3','T4','T5','T6','T7','CN'];
+  const weekMins=days.map((_,i)=>{
+    const now=new Date();
+    const diff=i-(now.getDay()===0?6:now.getDay()-1);
+    const target=new Date(now);target.setDate(now.getDate()+diff);
+    const dk=target.toISOString().split('T')[0];
+    return sessions.filter(s=>s.endTime&&s.endTime.startsWith(dk)).reduce((a,s)=>a+s.duration,0);
+  });
+  const maxWM=Math.max(...weekMins,1);
+  document.getElementById('st-weekly-chart').innerHTML=days.map((d,i)=>`
+    <div class="bar-col">
+      <div class="bar-val">${weekMins[i]>=60?Math.round(weekMins[i]/60)+'h':weekMins[i]+'p'}</div>
+      <div class="bar" style="height:${Math.max(4,Math.round(weekMins[i]/maxWM*100))}%;background:linear-gradient(to top,var(--accent),var(--teal))"></div>
+      <div class="bar-lbl">${d}</div>
+    </div>`).join('');
+
+  // Expense donut
+  const monthExp=expenses.filter(e=>e.date.startsWith(curMonth())&&e.amount<0);
+  const byCat={};
+  monthExp.forEach(e=>{byCat[e.cat]=(byCat[e.cat]||0)+Math.abs(e.amount);});
+  const totalExp=Object.values(byCat).reduce((a,v)=>a+v,1);
+  let cumPct=0;
+  const donutSegs=Object.entries(byCat).map(([cat,amt])=>{
+    const pct=Math.round(amt/totalExp*100);
+    const seg=`${catInfo[cat]?.color||'#888'} ${cumPct}% ${cumPct+pct}%`;
+    cumPct+=pct;return seg;
+  }).join(',');
+  document.getElementById('st-expense-donut').style.background=`conic-gradient(${donutSegs||'var(--bg3) 0% 100%'})`;
+  document.getElementById('st-expense-donut').textContent=fmtMoney(totalExp);
+  document.getElementById('st-expense-legend').innerHTML=Object.entries(byCat).map(([cat,amt])=>`
+    <div class="leg-item">
+      <div class="leg-dot" style="background:${catInfo[cat]?.color||'#888'}"></div>
+      ${catInfo[cat]?.label||cat}: ${Math.round(amt/totalExp*100)}%
+    </div>`).join('');
+
+  // DL donut
+  const totalDL=deadlines.length;
+  const doneDL=deadlines.filter(d=>d.done).length;
+  const pctDone=totalDL?Math.round(doneDL/totalDL*100):0;
+  document.getElementById('st-dl-donut').style.background=`conic-gradient(var(--green) 0% ${pctDone}%,var(--red) ${pctDone}% 100%)`;
+  document.getElementById('st-dl-donut').textContent=pctDone+'%';
+  document.getElementById('st-dl-info').innerHTML=`
+    <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Đúng hạn: ${doneDL}/${totalDL}</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Chưa xong: ${totalDL-doneDL}/${totalDL}</div>
+    <br><div style="font-size:12px;color:var(--text3)">Tỉ lệ hoàn thành</div>
+    <div style="font-size:28px;font-weight:900;color:var(--green)">${pctDone}%</div>`;
+
+  // Focus chart
+  const fdays=['T2','T3','T4','T5','T6','T7','CN'];
+  const focusByDay=fdays.map((_,i)=>{
+    const now=new Date();
+    const diff=i-(now.getDay()===0?6:now.getDay()-1);
+    const target=new Date(now);target.setDate(now.getDate()+diff);
+    return Math.floor(Math.random()*6+1); // demo data
+  });
+  const maxFD=Math.max(...focusByDay,1);
+  document.getElementById('st-focus-chart').innerHTML=fdays.map((d,i)=>`
+    <div class="bar-col">
+      <div class="bar-val">${focusByDay[i]}</div>
+      <div class="bar" style="height:${Math.round(focusByDay[i]/maxFD*100)}%;background:linear-gradient(to top,var(--pink),var(--amber))"></div>
+      <div class="bar-lbl">${d}</div>
+    </div>`).join('');
+
+  // Summary
+  const profile=load(KEYS.profile,{});
+  const totalStudyH=Math.round(sessions.reduce((a,s)=>a+s.duration,0)/60*10)/10;
+  document.getElementById('st-summary').innerHTML=`
+    <div style="text-align:center;padding:10px">
+      <div style="font-size:28px;font-weight:900;color:var(--accent)">${profile.gpa||'N/A'}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">GPA tích lũy</div>
+    </div>
+    <div style="text-align:center;padding:10px">
+      <div style="font-size:28px;font-weight:900;color:var(--green)">${totalStudyH}h</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">Tổng giờ học</div>
+    </div>
+    <div style="text-align:center;padding:10px">
+      <div style="font-size:28px;font-weight:900;color:var(--amber)">${fmtMoney(expenses.filter(e=>e.amount<0).reduce((a,e)=>a+Math.abs(e.amount),0))}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">Tổng chi tiêu</div>
+    </div>
+    <div style="text-align:center;padding:10px">
+      <div style="font-size:28px;font-weight:900;color:var(--teal)">🔥${focusData.streak||0}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">Ngày streak</div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════════════
+function selectAvatar(el,val){
+  document.querySelectorAll('#modal-profile span[onclick]').forEach(x=>x.style.opacity='0.4');
+  el.style.opacity='1';
+  document.getElementById('pf-inp-avatar').value=val;
+}
+
+function saveProfile(){
+  const p={
+    name:document.getElementById('pf-inp-name').value.trim()||'Sinh viên',
+    mssv:document.getElementById('pf-inp-mssv').value,
+    classname:document.getElementById('pf-inp-class').value,
+    faculty:document.getElementById('pf-inp-faculty').value,
+    semester:document.getElementById('pf-inp-semester').value,
+    gpa:document.getElementById('pf-inp-gpa').value,
+    email:document.getElementById('pf-inp-email').value,
+    avatar:document.getElementById('pf-inp-avatar').value||'👤',
+  };
+  save(KEYS.profile,p);
+  closeModal('modal-profile');
+  renderProfile();
+  updateSidebarProfile();
+  toast('✅ Đã lưu hồ sơ!','success');
+}
+
+function openProfileModal(){
+  const p=load(KEYS.profile,{});
+  document.getElementById('pf-inp-name').value=p.name||'';
+  document.getElementById('pf-inp-mssv').value=p.mssv||'';
+  document.getElementById('pf-inp-class').value=p.classname||'';
+  document.getElementById('pf-inp-faculty').value=p.faculty||'';
+  document.getElementById('pf-inp-semester').value=p.semester||'Học kỳ 2';
+  document.getElementById('pf-inp-gpa').value=p.gpa||'';
+  document.getElementById('pf-inp-email').value=p.email||'';
+  document.getElementById('pf-inp-avatar').value=p.avatar||'👤';
+  openModal('modal-profile');
+}
+
+function renderProfile(){
+  const p=load(KEYS.profile,{name:'Sinh viên'});
+  document.getElementById('pf-avatar').textContent=p.avatar||'👤';
+  document.getElementById('pf-name-display').textContent=p.name||'Sinh viên';
+  document.getElementById('pf-sub-display').textContent=
+    [p.mssv,p.classname,p.faculty,p.semester].filter(Boolean).join(' · ')||'Chưa cập nhật thông tin';
+
+  const sessions=load(KEYS.sessions,[]);
+  const deadlines=load(KEYS.deadlines,[]);
+  const goals=load(KEYS.goals,[]);
+  const expenses=load(KEYS.expenses,[]);
+  const badges=[];
+  if(sessions.length>=10) badges.push({emoji:'📚',label:'Học chăm chỉ'});
+  if(sessions.reduce((a,s)=>a+s.duration,0)>=600) badges.push({emoji:'⏰',label:'10h học tập'});
+  if(goals.filter(g=>g.status==='done').length>=1) badges.push({emoji:'🏆',label:'Hoàn thành mục tiêu'});
+  if(deadlines.filter(d=>d.done).length>=5) badges.push({emoji:'✅',label:'5 deadline đúng hạn'});
+  if(load(KEYS.focusData,{}).streak>=3) badges.push({emoji:'🔥',label:'3 ngày streak'});
+
+  document.getElementById('pf-badges').innerHTML=badges.map(b=>`
+    <span class="tag tag-purple">${b.emoji} ${b.label}</span>`).join('');
+
+  const subjects=load(KEYS.subjects,[]);
+  document.getElementById('pf-subjects').innerHTML=subjects.length?subjects.map(s=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
+      <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700">${s.name}</div>
+        <div style="font-size:11px;color:var(--text3)">${s.code||''} · ${s.credits||0} TC · ${s.score||0}%</div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="editSubject(${s.id})">✏️</button>
+        <button class="btn btn-danger btn-icon btn-sm" onclick="deleteSubject(${s.id})">🗑</button>
+      </div>
+    </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:12px 0">Chưa có môn học nào</div>';
+
+  // Quick stats
+  document.getElementById('pf-quick-stats').innerHTML=`
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px;color:var(--text2)">📚 Tổng sessions</span>
+      <span style="font-size:13px;font-weight:700;color:var(--accent)">${sessions.length}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px;color:var(--text2)">⏱ Tổng giờ học</span>
+      <span style="font-size:13px;font-weight:700;color:var(--green)">${Math.round(sessions.reduce((a,s)=>a+s.duration,0)/60*10)/10}h</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px;color:var(--text2)">✅ Deadline hoàn thành</span>
+      <span style="font-size:13px;font-weight:700;color:var(--teal)">${deadlines.filter(d=>d.done).length}/${deadlines.length}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0">
+      <span style="font-size:13px;color:var(--text2)">💰 Chi tiêu tháng này</span>
+      <span style="font-size:13px;font-weight:700;color:var(--amber)">${fmtMoney(expenses.filter(e=>e.date.startsWith(curMonth())&&e.amount<0).reduce((a,e)=>a+Math.abs(e.amount),0))}</span>
+    </div>
+  `;
+
+  document.getElementById('pf-achievements').innerHTML=badges.length?
+    badges.map(b=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:20px">${b.emoji}</span>
+      <span style="font-size:13px;font-weight:600">${b.label}</span>
+    </div>`).join(''):
+    `<div style="color:var(--text3);font-size:13px;padding:12px 0">Hoàn thành các hoạt động để mở thành tích!</div>`;
+}
+
+function updateSidebarProfile(){
+  const p=load(KEYS.profile,{name:'Sinh viên'});
+  document.getElementById('sf-name').textContent=`${p.avatar||'👤'} ${p.name||'Sinh viên'}`;
+  document.getElementById('sf-sub').textContent=[p.classname,p.faculty].filter(Boolean).join(' · ')||'Chưa có thông tin';
+}
+
+// SUBJECTS
+function saveSubject(){
+  const name=document.getElementById('subj-name').value.trim();
+  if(!name){toast('❌ Vui lòng nhập tên môn!','error');return;}
+  const id=document.getElementById('subj-edit-id').value;
+  const item={
+    id:id?Number(id):Date.now(),
+    name,
+    code:document.getElementById('subj-code').value,
+    credits:parseInt(document.getElementById('subj-credits').value)||3,
+    score:parseInt(document.getElementById('subj-score').value)||0,
+    color:document.getElementById('subj-color').value,
+  };
+  let subjects=load(KEYS.subjects,[]);
+  if(id) subjects=subjects.map(x=>x.id===item.id?item:x);
+  else subjects.push(item);
+  save(KEYS.subjects,subjects);
+  closeModal('modal-subject');
+  renderProfile();
+  toast('✅ Đã lưu môn học!','success');
+}
+
+function editSubject(id){
+  const s=load(KEYS.subjects,[]).find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('modal-subject-title').textContent='Chỉnh sửa môn học';
+  document.getElementById('subj-edit-id').value=id;
+  document.getElementById('subj-name').value=s.name;
+  document.getElementById('subj-code').value=s.code||'';
+  document.getElementById('subj-credits').value=s.credits||3;
+  document.getElementById('subj-score').value=s.score||0;
+  document.getElementById('subj-color').value=s.color||'#7c6af7';
+  openModal('modal-subject');
+}
+
+function deleteSubject(id){
+  if(!confirm('Xóa môn học này?')) return;
+  save(KEYS.subjects,load(KEYS.subjects,[]).filter(x=>x.id!==id));
+  renderProfile();
+  toast('🗑 Đã xóa môn học');
+}
+
+// ═══════════════════════════════════════════
+//  EXPORT / IMPORT
+// ═══════════════════════════════════════════
+function exportData(){
+  const data={};
+  Object.values(KEYS).forEach(k=>{try{data[k]=JSON.parse(localStorage.getItem(k));}catch(e){}});
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`studylife-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  toast('📥 Đã xuất dữ liệu!','success');
+}
+
+function importData(input){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      Object.entries(data).forEach(([k,v])=>{if(v!==null)localStorage.setItem(k,JSON.stringify(v));});
+      toast('✅ Đã nhập dữ liệu thành công!','success');
+      setTimeout(()=>location.reload(),1000);
+    }catch(err){toast('❌ File không hợp lệ!','error');}
+  };
+  reader.readAsText(file);
+}
+
+function resetAllData(){
+  if(!confirm('⚠️ Xóa toàn bộ dữ liệu? Hành động này không thể hoàn tác!')) return;
+  if(!confirm('Bạn chắc chắn muốn xóa hết không?')) return;
+  Object.values(KEYS).forEach(k=>localStorage.removeItem(k));
+  toast('🗑 Đã xóa toàn bộ dữ liệu');
+  setTimeout(()=>location.reload(),1000);
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+initDefaults();
+updateSidebarProfile();
+renderPage('dashboard');
+
+// Patch schedule button
+document.querySelector('#page-schedule .sh .btn-primary').addEventListener('click',openClassModal);
+// Patch budget modal button
+document.addEventListener('click',e=>{
+  if(e.target.textContent.includes('⚙️ Cài đặt') && e.target.classList.contains('btn-sm')) openBudgetModal();
+  if(e.target.textContent.includes('✏️ Chỉnh sửa') && curPage==='profile') openProfileModal();
+});
+</script>
+</body>
+</html>
