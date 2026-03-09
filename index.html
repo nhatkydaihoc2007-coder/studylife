@@ -469,8 +469,35 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </aside>
 
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="
+  display:flex;position:fixed;inset:0;z-index:9999;
+  background:var(--bg);align-items:center;justify-content:center;
+  flex-direction:column;gap:0;
+">
+  <div style="text-align:center;max-width:380px;width:90%;padding:20px;">
+    <div style="font-size:52px;margin-bottom:12px;">📚</div>
+    <div style="font-size:32px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;">StudyLife</div>
+    <div style="font-size:14px;color:var(--text3);margin-bottom:36px;">Quản lý toàn bộ đời sống sinh viên</div>
+    <button onclick="signInWithGoogle()" id="login-btn" style="
+      display:flex;align-items:center;justify-content:center;gap:12px;
+      width:100%;padding:14px 20px;border-radius:12px;border:1px solid var(--border2);
+      background:var(--surface2);color:var(--text);cursor:pointer;
+      font-family:var(--font);font-size:15px;font-weight:700;transition:all .2s;
+    " onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(124,106,247,.12)'"
+       onmouseout="this.style.borderColor='var(--border2)';this.style.background='var(--surface2)'">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Đăng nhập bằng Google
+    </button>
+    <div id="login-error" style="margin-top:12px;font-size:12px;color:var(--red);display:none;"></div>
+    <div style="margin-top:24px;font-size:11px;color:var(--text3);line-height:1.7;">
+      Dữ liệu của bạn được lưu riêng biệt và bảo mật.<br>Chỉ bạn mới xem được dữ liệu của mình.
+    </div>
+  </div>
+</div>
+
 <!-- MAIN -->
-<main class="main" id="main-scroll">
+<main class="main" id="main-scroll" style="display:none">
   <div class="topbar">
     <div class="topbar-left">
       <div class="pt" id="pt">Dashboard</div>
@@ -480,6 +507,13 @@ textarea.fi{resize:vertical;min-height:70px;}
       <span class="save-indicator" id="save-ind" style="display:none">✓ Đã lưu</span>
       <button class="btn btn-ghost btn-sm" onclick="exportData()">📥 Xuất dữ liệu</button>
       <button class="btn btn-primary btn-sm" id="action-btn" onclick="handleAction()">+ Thêm mới</button>
+      <div id="user-avatar" onclick="signOut()" title="Đăng xuất" style="
+        width:32px;height:32px;border-radius:50%;overflow:hidden;cursor:pointer;
+        border:2px solid var(--border2);flex-shrink:0;transition:border-color .2s;
+        display:flex;align-items:center;justify-content:center;background:var(--surface2);font-size:14px;
+      " onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border2)'">
+        👤
+      </div>
     </div>
   </div>
 
@@ -2418,9 +2452,7 @@ function resetAllData(){
 // ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
-initDefaults();
-updateSidebarProfile();
-renderPage('dashboard');
+// Firebase handles init — see bottom of file
 
 // Patch schedule button
 document.querySelector('#page-schedule .sh .btn-primary').addEventListener('click',openClassModal);
@@ -2429,6 +2461,175 @@ document.addEventListener('click',e=>{
   if(e.target.textContent.includes('⚙️ Cài đặt') && e.target.classList.contains('btn-sm')) openBudgetModal();
   if(e.target.textContent.includes('✏️ Chỉnh sửa') && curPage==='profile') openProfileModal();
 });
+</script>
+
+<!-- ═══ FIREBASE ═══ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA6NLPdp4GKkE611T0trzK7ihjiHeaJJeE",
+  authDomain: "studylife-app.firebaseapp.com",
+  projectId: "studylife-app",
+  storageBucket: "studylife-app.firebasestorage.app",
+  messagingSenderId: "1052442016951",
+  appId: "1:1052442016951:web:09da212b2af51aff30a132"
+};
+
+const fbApp  = initializeApp(firebaseConfig);
+const auth   = getAuth(fbApp);
+const db     = getFirestore(fbApp);
+
+let currentUser = null;
+let syncTimeout = null;
+let unsubSnapshot = null;
+
+// ── Auth ──
+window.signInWithGoogle = async () => {
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  btn.textContent = '⏳ Đang đăng nhập...';
+  btn.disabled = true;
+  err.style.display = 'none';
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch(e) {
+    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Đăng nhập bằng Google`;
+    btn.disabled = false;
+    err.style.display = 'block';
+    err.textContent = '❌ ' + (e.code === 'auth/popup-closed-by-user' ? 'Bạn đã đóng cửa sổ đăng nhập.' : e.message);
+  }
+};
+
+window.signOut = async () => {
+  if(!confirm('Đăng xuất khỏi StudyLife?')) return;
+  if(unsubSnapshot) unsubSnapshot();
+  await fbSignOut(auth);
+};
+
+// ── Auth state ──
+onAuthStateChanged(auth, async user => {
+  if(user) {
+    currentUser = user;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-scroll').style.display = 'flex';
+    document.getElementById('main-scroll').style.flexDirection = 'column';
+
+    // Avatar
+    const av = document.getElementById('user-avatar');
+    if(user.photoURL) {
+      av.innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover;">`;
+    } else {
+      av.textContent = user.displayName?.[0]?.toUpperCase() || '👤';
+    }
+    av.title = `${user.displayName || user.email} — Nhấn để đăng xuất`;
+
+    // Greet
+    document.getElementById('ps').textContent =
+      `Chào ${user.displayName?.split(' ').pop() || 'bạn'}! 👋`;
+
+    // Load data from Firestore
+    await loadFromFirestore();
+
+    // Listen for realtime changes from other devices
+    listenRealtime();
+
+    initDefaults();
+    updateSidebarProfile();
+    renderPage('dashboard');
+  } else {
+    currentUser = null;
+    if(unsubSnapshot){ unsubSnapshot(); unsubSnapshot=null; }
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('main-scroll').style.display = 'none';
+    const btn = document.getElementById('login-btn');
+    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Đăng nhập bằng Google`;
+    btn.disabled = false;
+  }
+});
+
+// ── Firestore helpers ──
+function userDoc() {
+  return doc(db, 'users', currentUser.uid);
+}
+
+async function loadFromFirestore() {
+  try {
+    const snap = await getDoc(userDoc());
+    if(snap.exists()) {
+      const data = snap.data();
+      // Write cloud data into localStorage
+      Object.entries(data).forEach(([k, v]) => {
+        if(v !== null && v !== undefined) {
+          localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+        }
+      });
+    }
+  } catch(e) {
+    console.warn('Firestore load error:', e);
+  }
+}
+
+function listenRealtime() {
+  if(unsubSnapshot) unsubSnapshot();
+  unsubSnapshot = onSnapshot(userDoc(), snap => {
+    if(!snap.exists() || !currentUser) return;
+    const data = snap.data();
+    // Only update localStorage if data changed from another device
+    // (we skip if _lastWriter is this tab)
+    if(data._lastWriter && data._lastWriter === window._tabId) return;
+    let changed = false;
+    Object.entries(data).forEach(([k, v]) => {
+      if(k.startsWith('_')) return;
+      const newVal = typeof v === 'string' ? v : JSON.stringify(v);
+      if(localStorage.getItem(k) !== newVal) {
+        localStorage.setItem(k, newVal);
+        changed = true;
+      }
+    });
+    if(changed) {
+      renderPage(curPage);
+      toast('🔄 Dữ liệu đã đồng bộ từ thiết bị khác');
+    }
+  }, err => console.warn('Snapshot error:', err));
+}
+
+// ── Override save() to also write to Firestore ──
+window._tabId = Math.random().toString(36).slice(2);
+const _originalSave = window.save; // grab the existing save fn
+
+// Re-define save to also push to Firestore
+window.save = function(key, val) {
+  // Call original localStorage save
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+    showSaved();
+  } catch(e) { console.error(e); }
+
+  // Push to Firestore (debounced 1.5s to batch rapid changes)
+  if(!currentUser) return;
+  clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(async () => {
+    try {
+      // Gather all app keys
+      const payload = { _lastWriter: window._tabId, _updatedAt: new Date().toISOString() };
+      Object.values(KEYS).forEach(k => {
+        try {
+          const raw = localStorage.getItem(k);
+          if(raw) payload[k] = JSON.parse(raw);
+        } catch(e) {}
+      });
+      await setDoc(userDoc(), payload, { merge: true });
+    } catch(e) {
+      console.warn('Firestore sync error:', e);
+    }
+  }, 1500);
+};
 </script>
 </body>
 </html>
