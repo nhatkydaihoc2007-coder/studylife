@@ -64,7 +64,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
 .sf-sub{font-size:11px;color:var(--text3);margin-top:2px;}
 .sf-edit{font-size:11px;color:var(--accent);margin-top:6px;}
 
-/* MAIN*/
+/* MAIN */
 .main{
   margin-left:var(--sidebar);flex:1;
   height:100vh;overflow-y:auto;display:flex;flex-direction:column;
@@ -442,7 +442,6 @@ textarea.fi{resize:vertical;min-height:70px;}
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="logo">Study<span style="-webkit-text-fill-color:var(--text2);font-weight:300">Life</span></div>
 
@@ -471,7 +470,6 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </aside>
 
-<!-- LOGIN SCREEN -->
 <div id="login-screen" style="
   display:flex;position:fixed;inset:0;z-index:9999;
   background:var(--bg);align-items:center;justify-content:center;
@@ -498,7 +496,6 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </div>
 
-<!-- MAIN -->
 <main class="main" id="main-scroll" style="display:none">
   <div class="topbar">
     <div class="topbar-left">
@@ -521,7 +518,6 @@ textarea.fi{resize:vertical;min-height:70px;}
 
   <div class="content">
 
-  <!-- ════ DASHBOARD ════ -->
   <div class="page active" id="page-dashboard">
     <div class="g4 mb24" id="dash-stats"></div>
     <div class="g2 mb20">
@@ -546,7 +542,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  <!-- ════ SCHEDULE ════ -->
   <div class="page" id="page-schedule">
     <div class="day-tabs" id="day-tabs"></div>
     <div class="sh">
@@ -556,7 +551,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     <div id="sched-list"></div>
   </div>
 
-  <!-- ════ DEADLINES ════ -->
   <div class="page" id="page-deadlines">
     <div class="dl-filters">
       <button class="dl-filter active" onclick="dlFilter(this,'all')">Tất cả</button>
@@ -568,7 +562,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     <div id="dl-list"></div>
   </div>
 
-  <!-- ════ TRACKER ════ -->
   <div class="page" id="page-tracker">
     <div class="g2 mb20">
       <div class="timer-card">
@@ -629,7 +622,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  <!-- ════ FOCUS ════ -->
   <div class="page" id="page-focus">
     <div class="focus-wrap">
       <div class="focus-presets" id="focus-presets">
@@ -703,7 +695,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  <!-- ════ NOTES ════ -->
   <div class="page" id="page-notes">
     <div class="sh mb20">
       <div>
@@ -718,7 +709,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     <div class="notes-grid" id="notes-grid"></div>
   </div>
 
-  <!-- ════ EXPENSE ════ -->
   <div class="page" id="page-expense">
     <div class="exp-summary" id="exp-summary"></div>
     <div class="g2">
@@ -790,7 +780,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  <!-- ════ GOALS ════ -->
   <div class="page" id="page-goals">
     <div class="sh mb20">
       <div>
@@ -802,7 +791,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     <div class="g2" id="goals-grid"></div>
   </div>
 
-  <!-- ════ STATS ════ -->
   <div class="page" id="page-stats">
     <div class="g2 mb20">
       <div class="card">
@@ -836,7 +824,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  <!-- ════ PROFILE ════ -->
   <div class="page" id="page-profile">
     <div class="profile-header">
       <div class="avatar" id="pf-avatar">👤</div>
@@ -897,13 +884,9 @@ textarea.fi{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  </div><!-- /content -->
-
-  <!-- ════ GPA CALCULATOR ════ -->
-  <div class="page" id="page-gpa" style="display:none">
+  </div><div class="page" id="page-gpa" style="display:none">
   <div style="padding:24px 28px">
     <div class="g2 mb20">
-      <!-- Nhập điểm -->
       <div class="card">
         <div class="sh">
           <div class="sh-title">📋 Nhập điểm môn học</div>
@@ -913,11 +896,15 @@ textarea.fi{resize:vertical;min-height:70px;}
           <table style="width:100%;border-collapse:collapse;font-size:13px" id="gpa-table">
             <thead>
               <tr style="border-bottom:2px solid var(--border)">
-                <th style="text-align:left;padding:8px 6px;color:var(--text3);font-weight:700;font-size:11px;text-transform:uppercase">Môn học</th>
-                <th style="text-align:center;padding:8px 6px;color:var(--text3);font-weight:700;font-size:11px">TC</th>
-                <th style="text-align:center;padding:8px 6px;color:var(--text3);font-weight:700;font-size:11px">Điểm /10</th>
-                <th style="text-align:center;padding:8px 6px;color:var(--text3);font-weight:700;font-size:11px">Chữ</th>
-                <th style="text-align:center;padding:8px 6px;color:var(--text3);font-weight:700;font-size:11px">Hệ 4</th>
+                <th style="text-align:left;padding:8px 2px;color:var(--text3);font-weight:700;font-size:11px;text-transform:uppercase">Môn học</th>
+                <th style="text-align:center;padding:8px 2px;color:var(--text3);font-weight:700;font-size:11px" title="Tín chỉ">TC</th>
+                <th style="text-align:center;padding:8px 2px;color:var(--text3);font-weight:700;font-size:11px" title="Điểm quá trình 10%">10%</th>
+                <th style="text-align:center;padding:8px 2px;color:var(--text3);font-weight:700;font-size:11px" title="Giữa kỳ 1 20%">20%</th>
+                <th style="text-align:center;padding:8px 2px;color:var(--text3);font-weight:700;font-size:11px" title="Giữa kỳ 2 20%">20%</th>
+                <th style="text-align:center;padding:8px 2px;color:var(--text3);font-weight:700;font-size:11px" title="Cuối kỳ 50%">50%</th>
+                <th style="text-align:center;padding:8px 2px;color:var(--text3);font-weight:700;font-size:11px">TK</th>
+                <th style="text-align:center;padding:8px 2px;color:var(--text3);font-weight:700;font-size:11px">Chữ</th>
+                <th style="text-align:center;padding:8px 2px;color:var(--text3);font-weight:700;font-size:11px">Hệ 4</th>
                 <th style="padding:4px"></th>
               </tr>
             </thead>
@@ -931,20 +918,19 @@ textarea.fi{resize:vertical;min-height:70px;}
         </div>
       </div>
 
-      <!-- Kết quả -->
       <div>
         <div class="card mb16">
           <div class="card-title">🎓 Kết quả GPA</div>
           <div style="text-align:center;padding:16px 0">
             <div style="font-size:64px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--accent),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="gpa-result-4">0.00</div>
-            <div style="font-size:14px;color:var(--text3);margin-top:6px">Thang điểm 4</div>
+            <div style="font-size:14px;color:var(--text3);margin-top:6px">GPA Hệ 4 (Tích lũy toàn khoá)</div>
             <div style="font-size:28px;font-weight:800;color:var(--text);margin-top:12px" id="gpa-result-10">0.0</div>
-            <div style="font-size:13px;color:var(--text3)">Thang điểm 10</div>
+            <div style="font-size:13px;color:var(--text3)">GPA Hệ 10</div>
             <div style="margin-top:16px;padding:10px 16px;border-radius:var(--r);display:inline-block;font-size:14px;font-weight:800" id="gpa-rank-badge">—</div>
           </div>
           <div style="margin-top:12px">
             <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
-              <span>Tiến độ đạt xuất sắc (≥3.6)</span>
+              <span>Tiến độ đạt Giỏi (≥3.2)</span>
               <span id="gpa-pct-text">0%</span>
             </div>
             <div class="prog-bar"><div class="prog-fill" id="gpa-bar" style="width:0%;background:linear-gradient(90deg,var(--accent),var(--teal))"></div></div>
@@ -957,32 +943,49 @@ textarea.fi{resize:vertical;min-height:70px;}
         </div>
 
         <div class="card">
-          <div class="card-title">🗺 Bảng quy đổi điểm</div>
-          <table style="width:100%;border-collapse:collapse;font-size:12px">
-            <tr style="border-bottom:1px solid var(--border)">
-              <th style="text-align:left;padding:6px 0;color:var(--text3)">Thang 10</th>
-              <th style="text-align:center;padding:6px 0;color:var(--text3)">Chữ</th>
-              <th style="text-align:center;padding:6px 0;color:var(--text3)">Thang 4</th>
-              <th style="text-align:center;padding:6px 0;color:var(--text3)">Xếp loại</th>
-            </tr>
-            ${[['8.5–10','A / A+','4.0','Xuất sắc'],['8.0–8.4','A-','3.7','Giỏi'],['7.0–7.9','B+','3.5','Giỏi'],['6.5–6.9','B','3.0','Khá'],['6.0–6.4','B-','2.7','Khá'],['5.5–5.9','C+','2.3','TB Khá'],['5.0–5.4','C','2.0','Trung bình'],['4.5–4.9','C-','1.7','TB Yếu'],['4.0–4.4','D+','1.3','Yếu'],['<4.0','F','0','Không đạt']].map(r=>`
-            <tr style="border-bottom:1px solid var(--border)">
-              <td style="padding:5px 0;font-family:var(--mono);font-size:11px">${r[0]}</td>
-              <td style="text-align:center;font-weight:700;color:var(--accent)">${r[1]}</td>
-              <td style="text-align:center;font-weight:700">${r[2]}</td>
-              <td style="text-align:center;font-size:11px;color:var(--text3)">${r[3]}</td>
-            </tr>`).join('')}
-          </table>
+          <div class="card-title">🗺 Bảng quy đổi điểm & Xếp loại</div>
+          <div class="g2">
+            <table style="width:100%;border-collapse:collapse;font-size:11px">
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:6px 0;color:var(--text3)">Thang 10</th>
+                <th style="text-align:center;padding:6px 0;color:var(--text3)">Chữ</th>
+                <th style="text-align:center;padding:6px 0;color:var(--text3)">Hệ 4</th>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">9.5–10.0</td><td style="text-align:center;font-weight:700;color:var(--accent)">A+</td><td style="text-align:center;font-weight:700">4.0</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">9.0–9.4</td><td style="text-align:center;font-weight:700;color:var(--accent)">A</td><td style="text-align:center;font-weight:700">3.7</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">8.5–8.9</td><td style="text-align:center;font-weight:700;color:var(--accent)">A-</td><td style="text-align:center;font-weight:700">3.4</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">8.0–8.4</td><td style="text-align:center;font-weight:700;color:var(--accent)">B+</td><td style="text-align:center;font-weight:700">3.2</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">7.5–7.9</td><td style="text-align:center;font-weight:700;color:var(--accent)">B</td><td style="text-align:center;font-weight:700">3.0</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">7.0–7.4</td><td style="text-align:center;font-weight:700;color:var(--accent)">B-</td><td style="text-align:center;font-weight:700">2.8</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">6.5–6.9</td><td style="text-align:center;font-weight:700;color:var(--accent)">C+</td><td style="text-align:center;font-weight:700">2.6</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">6.0–6.4</td><td style="text-align:center;font-weight:700;color:var(--accent)">C</td><td style="text-align:center;font-weight:700">2.4</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">5.5–5.9</td><td style="text-align:center;font-weight:700;color:var(--accent)">C-</td><td style="text-align:center;font-weight:700">2.2</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">5.0–5.4</td><td style="text-align:center;font-weight:700;color:var(--accent)">D+</td><td style="text-align:center;font-weight:700">2.0</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">4.5–4.9</td><td style="text-align:center;font-weight:700;color:var(--accent)">D</td><td style="text-align:center;font-weight:700">1.8</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">4.0–4.4</td><td style="text-align:center;font-weight:700;color:var(--accent)">D-</td><td style="text-align:center;font-weight:700">1.6</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">&lt;4.0</td><td style="text-align:center;font-weight:700;color:var(--accent)">F</td><td style="text-align:center;font-weight:700">0.0</td></tr>
+            </table>
+            <table style="width:100%;border-collapse:collapse;font-size:11px">
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:6px 0;color:var(--text3)">GPA Hệ 4</th>
+                <th style="text-align:center;padding:6px 0;color:var(--text3)">Xếp loại</th>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">3.6–4.0</td><td style="text-align:center;font-weight:700;color:var(--teal)">Xuất sắc</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">3.2–&lt;3.6</td><td style="text-align:center;font-weight:700;color:var(--teal)">Giỏi</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">2.5–&lt;3.2</td><td style="text-align:center;font-weight:700;color:var(--teal)">Khá</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">2.0–&lt;2.5</td><td style="text-align:center;font-weight:700;color:var(--teal)">Trung bình</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">1.0–&lt;2.0</td><td style="text-align:center;font-weight:700;color:var(--teal)">Yếu</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:4px 0;font-family:var(--mono);">&lt;1.0</td><td style="text-align:center;font-weight:700;color:var(--teal)">Kém</td></tr>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
   </div>
 
-  <!-- ════ GAMIFICATION ════ -->
   <div class="page" id="page-gamification" style="display:none">
   <div style="padding:24px 28px">
-    <!-- XP & Level banner -->
     <div class="card mb20" style="background:linear-gradient(135deg,rgba(124,106,247,.2),rgba(45,212,191,.1));border-color:rgba(124,106,247,.4)">
       <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
         <div style="font-size:60px" id="gm-avatar-big">🎮</div>
@@ -1008,12 +1011,10 @@ textarea.fi{resize:vertical;min-height:70px;}
     </div>
 
     <div class="g2 mb20">
-      <!-- Stats nhanh -->
       <div class="card">
         <div class="card-title">⚡ Thống kê chiến binh</div>
         <div id="gm-stats-list"></div>
       </div>
-      <!-- Daily quests -->
       <div class="card">
         <div class="card-title">📋 Nhiệm vụ hôm nay</div>
         <div id="gm-quests"></div>
@@ -1023,13 +1024,11 @@ textarea.fi{resize:vertical;min-height:70px;}
       </div>
     </div>
 
-    <!-- Achievements -->
     <div class="card mb20">
       <div class="card-title">🏅 Thành tích đã mở khoá</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:4px" id="gm-achievements"></div>
     </div>
 
-    <!-- Leaderboard placeholder -->
     <div class="card">
       <div class="card-title">🏆 Bảng xếp hạng cá nhân</div>
       <div id="gm-history"></div>
@@ -1039,9 +1038,6 @@ textarea.fi{resize:vertical;min-height:70px;}
 
 </main>
 
-<!-- ════ MODALS ════ -->
-
-<!-- Deadline Modal -->
 <div class="overlay" id="modal-dl">
   <div class="modal">
     <div class="modal-title">⏰ <span id="modal-dl-title">Thêm Deadline</span></div>
@@ -1076,7 +1072,6 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </div>
 
-<!-- Class Modal -->
 <div class="overlay" id="modal-class">
   <div class="modal">
     <div class="modal-title">📅 <span id="modal-class-title">Thêm lớp học</span></div>
@@ -1123,7 +1118,6 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </div>
 
-<!-- Goal Modal -->
 <div class="overlay" id="modal-goal">
   <div class="modal">
     <div class="modal-title">🏆 <span id="modal-goal-title">Thêm mục tiêu</span></div>
@@ -1155,7 +1149,6 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </div>
 
-<!-- Note Modal -->
 <div class="overlay" id="modal-note">
   <div class="modal">
     <div class="modal-title">📝 <span id="modal-note-title">Ghi chú mới</span></div>
@@ -1183,7 +1176,6 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </div>
 
-<!-- Profile Modal -->
 <div class="overlay" id="modal-profile">
   <div class="modal">
     <div class="modal-title">👤 Chỉnh sửa hồ sơ</div>
@@ -1228,7 +1220,6 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </div>
 
-<!-- Subject Modal -->
 <div class="overlay" id="modal-subject">
   <div class="modal">
     <div class="modal-title">📚 <span id="modal-subject-title">Thêm môn học</span></div>
@@ -1261,7 +1252,6 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </div>
 
-<!-- Budget Modal -->
 <div class="overlay" id="modal-budget">
   <div class="modal">
     <div class="modal-title">💰 Cài đặt ngân sách tháng</div>
@@ -2000,7 +1990,7 @@ function updateFocusRing(pct){
 }
 
 // ═══════════════════════════════════════════
-//  AUDIO ENGINE (Web Audio API — thật sự phát âm thanh)
+//  AUDIO ENGINE (Cải tiến thuật toán tạo Noise)
 // ═══════════════════════════════════════════
 let audioCtx=null,bgNode=null,bgGain=null,currentSound='none';
 
@@ -2010,20 +2000,27 @@ function getAudioCtx(){
   return audioCtx;
 }
 
-// Tạo âm thanh nền bằng Web Audio (không cần file mp3)
+// Sinh buffer Noise cân bằng, tránh Clipping/DC Offset gây mất tiếng ở Waves và Fire
 function createNoiseBuffer(ctx,type){
   const sr=ctx.sampleRate,len=sr*3;
   const buf=ctx.createBuffer(1,len,sr);
   const d=buf.getChannelData(0);
+  let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0, last=0;
   for(let i=0;i<len;i++){
-    if(type==='white') d[i]=(Math.random()*2-1);
-    else if(type==='pink'){
-      // Pink noise approximation
-      if(i===0){d[i]=0;continue;}
-      d[i]=d[i-1]*0.99+Math.random()*0.02-0.01;
+    let w=(Math.random()*2-1);
+    if(type==='white') {
+      d[i]=w;
+    } else if(type==='pink'){
+      // Pink noise using Paul Kellett's refined method
+      b0 = 0.99886*b0 + w*0.0555179; b1 = 0.99332*b1 + w*0.0750759;
+      b2 = 0.96900*b2 + w*0.1538520; b3 = 0.86650*b3 + w*0.3104856;
+      b4 = 0.55000*b4 + w*0.5329522; b5 = -0.7616*b5 - w*0.0168980;
+      d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w*0.5362) * 0.11;
+      b6 = w*0.115926;
     } else if(type==='brown'){
-      d[i]=(i===0?0:d[i-1])+Math.random()*0.04-0.02;
-      d[i]=Math.max(-1,Math.min(1,d[i]));
+      // Brown noise (leaky integrator)
+      last = (last + (0.02 * w)) / 1.02;
+      d[i] = last * 3.5;
     }
   }
   return buf;
@@ -2200,45 +2197,69 @@ function stopSound(){
 }
 
 // ═══════════════════════════════════════════
-//  GPA CALCULATOR
+//  GPA CALCULATOR (Cập nhật 4 đầu điểm & Thang điểm Hệ 4)
 // ═══════════════════════════════════════════
 let gpaRows=[];
 
-function score10ToLetter(s){
-  if(s>=8.5)return'A';if(s>=8.0)return'A-';if(s>=7.0)return'B+';
-  if(s>=6.5)return'B';if(s>=6.0)return'B-';if(s>=5.5)return'C+';
-  if(s>=5.0)return'C';if(s>=4.5)return'C-';if(s>=4.0)return'D+';return'F';
+function getGPAInfo(score) {
+  let s = Math.round(score * 10) / 10;
+  if(s >= 9.5) return { l: 'A+', p4: 4.0 };
+  if(s >= 9.0) return { l: 'A', p4: 3.7 };
+  if(s >= 8.5) return { l: 'A-', p4: 3.4 };
+  if(s >= 8.0) return { l: 'B+', p4: 3.2 };
+  if(s >= 7.5) return { l: 'B', p4: 3.0 };
+  if(s >= 7.0) return { l: 'B-', p4: 2.8 };
+  if(s >= 6.5) return { l: 'C+', p4: 2.6 };
+  if(s >= 6.0) return { l: 'C', p4: 2.4 };
+  if(s >= 5.5) return { l: 'C-', p4: 2.2 };
+  if(s >= 5.0) return { l: 'D+', p4: 2.0 };
+  if(s >= 4.5) return { l: 'D', p4: 1.8 };
+  if(s >= 4.0) return { l: 'D-', p4: 1.6 };
+  return { l: 'F', p4: 0.0 };
 }
-function score10To4(s){
-  if(s>=8.5)return 4.0;if(s>=8.0)return 3.7;if(s>=7.0)return 3.5;
-  if(s>=6.5)return 3.0;if(s>=6.0)return 2.7;if(s>=5.5)return 2.3;
-  if(s>=5.0)return 2.0;if(s>=4.5)return 1.7;if(s>=4.0)return 1.3;return 0;
-}
+
 function gpa4Rank(g){
-  if(g>=3.6)return{label:'Xuất sắc 🌟',bg:'rgba(251,191,36,.2)',color:'#fbbf24'};
-  if(g>=3.2)return{label:'Giỏi 🎖',bg:'rgba(52,211,153,.15)',color:'#34d399'};
-  if(g>=2.5)return{label:'Khá 👍',bg:'rgba(45,212,191,.15)',color:'#2dd4bf'};
-  if(g>=2.0)return{label:'Trung bình 📘',bg:'rgba(124,106,247,.15)',color:'#7c6af7'};
-  if(g>=1.0)return{label:'Yếu ⚠️',bg:'rgba(248,113,113,.15)',color:'#f87171'};
-  return{label:'Kém ❌',bg:'rgba(248,113,113,.2)',color:'#f87171'};
+  if(g >= 3.6) return {label:'Xuất sắc 🌟',bg:'rgba(251,191,36,.2)',color:'#fbbf24'};
+  if(g >= 3.2) return {label:'Giỏi 🎖',bg:'rgba(52,211,153,.15)',color:'#34d399'};
+  if(g >= 2.5) return {label:'Khá 👍',bg:'rgba(45,212,191,.15)',color:'#2dd4bf'};
+  if(g >= 2.0) return {label:'Trung bình 📘',bg:'rgba(124,106,247,.15)',color:'#7c6af7'};
+  if(g >= 1.0) return {label:'Yếu ⚠️',bg:'rgba(248,113,113,.15)',color:'#f87171'};
+  return {label:'Kém ❌',bg:'rgba(248,113,113,.2)',color:'#f87171'};
 }
 
 function renderGPA(){
   const saved=load('sl_gpa_rows',[]);
-  if(saved.length) gpaRows=saved;
+  if(saved.length) {
+    // Migration cho data cũ
+    gpaRows = saved.map(r => ({
+      name: r.name || '',
+      credits: r.credits || 3,
+      p10: r.p10 ?? r.score ?? 0,
+      p20a: r.p20a ?? r.score ?? 0,
+      p20b: r.p20b ?? r.score ?? 0,
+      p50: r.p50 ?? r.score ?? 0
+    }));
+  }
   if(!gpaRows.length) loadSubjectsToGPA();
   renderGPATable();
   calcGPA();
 }
 
 function loadSubjectsToGPA(){
-  const subjects=load(KEYS.subjects,[]);
-  gpaRows=subjects.map(s=>({name:s.name,credits:s.credits||3,score:s.score||0}));
-  renderGPATable();calcGPA();
+  const subjects = load(KEYS.subjects,[]);
+  gpaRows = subjects.map(s => ({
+    name: s.name,
+    credits: s.credits||3,
+    p10: s.score||0,
+    p20a: s.score||0,
+    p20b: s.score||0,
+    p50: s.score||0
+  }));
+  renderGPATable(); calcGPA();
 }
 
 function addGPARow(){
-  gpaRows.push({name:'',credits:3,score:0});
+  gpaRows.push({name:'',credits:3,p10:0,p20a:0,p20b:0,p50:0});
   renderGPATable();
 }
 
@@ -2249,11 +2270,11 @@ function clearGPARows(){
 
 function saveGPARows(){
   save('sl_gpa_rows',gpaRows);
-  // also update subjects scores
+  // Cập nhật lại vào Subjects (lấy điểm TK quy đổi thành % score)
   let subs=load(KEYS.subjects,[]);
   gpaRows.forEach(r=>{
     const s=subs.find(x=>x.name===r.name);
-    if(s) s.score=r.score;
+    if(s) s.score = Math.round((r.p10||0)*0.1 + (r.p20a||0)*0.2 + (r.p20b||0)*0.2 + (r.p50||0)*0.5);
   });
   save(KEYS.subjects,subs);
   toast('💾 Đã lưu điểm!','success');
@@ -2263,25 +2284,32 @@ function renderGPATable(){
   const tbody=document.getElementById('gpa-rows');
   if(!tbody) return;
   tbody.innerHTML=gpaRows.map((r,i)=>{
-    const letter=score10ToLetter(r.score);
-    const pt4=score10To4(r.score);
-    const col=pt4>=3.5?'var(--green)':pt4>=2.5?'var(--teal)':pt4>=1.0?'var(--amber)':'var(--red)';
+    const fScore = (r.p10||0)*0.1 + (r.p20a||0)*0.2 + (r.p20b||0)*0.2 + (r.p50||0)*0.5;
+    const info = getGPAInfo(fScore);
+    const col = info.p4>=3.2 ? 'var(--green)' : info.p4>=2.5 ? 'var(--teal)' : info.p4>=2.0 ? 'var(--amber)' : 'var(--red)';
     return `<tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:6px 4px">
-        <input class="fi" value="${r.name}" placeholder="Tên môn" style="min-width:130px;font-size:12px;padding:6px 8px"
-          oninput="gpaRows[${i}].name=this.value">
+      <td style="padding:6px 2px">
+        <input class="fi" value="${r.name}" placeholder="Tên môn" style="width:100%;font-size:12px;padding:6px 6px" oninput="gpaRows[${i}].name=this.value">
       </td>
-      <td style="padding:6px 4px;text-align:center">
-        <input class="fi" type="number" value="${r.credits}" min="1" max="10" style="width:48px;text-align:center;font-size:12px;padding:6px 4px"
-          oninput="gpaRows[${i}].credits=+this.value;calcGPA()">
+      <td style="padding:6px 2px;text-align:center">
+        <input class="fi" type="number" value="${r.credits}" min="1" max="10" style="width:40px;text-align:center;font-size:12px;padding:6px 2px" oninput="updateGPAInput(${i}, 'credits', this.value)">
       </td>
-      <td style="padding:6px 4px;text-align:center">
-        <input class="fi" type="number" value="${r.score}" min="0" max="10" step="0.1" style="width:64px;text-align:center;font-size:12px;padding:6px 4px"
-          oninput="gpaRows[${i}].score=+this.value;renderGPATable()">
+      <td style="padding:6px 2px;text-align:center">
+        <input class="fi" type="number" value="${r.p10}" min="0" max="10" step="0.1" style="width:44px;text-align:center;font-size:12px;padding:6px 2px" oninput="updateGPAInput(${i}, 'p10', this.value)">
       </td>
-      <td style="text-align:center;font-weight:800;color:${col}">${letter}</td>
-      <td style="text-align:center;font-weight:800;color:${col}">${pt4.toFixed(1)}</td>
-      <td style="padding:4px">
+      <td style="padding:6px 2px;text-align:center">
+        <input class="fi" type="number" value="${r.p20a}" min="0" max="10" step="0.1" style="width:44px;text-align:center;font-size:12px;padding:6px 2px" oninput="updateGPAInput(${i}, 'p20a', this.value)">
+      </td>
+      <td style="padding:6px 2px;text-align:center">
+        <input class="fi" type="number" value="${r.p20b}" min="0" max="10" step="0.1" style="width:44px;text-align:center;font-size:12px;padding:6px 2px" oninput="updateGPAInput(${i}, 'p20b', this.value)">
+      </td>
+      <td style="padding:6px 2px;text-align:center">
+        <input class="fi" type="number" value="${r.p50}" min="0" max="10" step="0.1" style="width:44px;text-align:center;font-size:12px;padding:6px 2px" oninput="updateGPAInput(${i}, 'p50', this.value)">
+      </td>
+      <td id="row-tk-${i}" style="text-align:center;font-weight:700;font-size:12px;color:var(--text2)">${(Math.round(fScore*10)/10).toFixed(1)}</td>
+      <td id="row-letter-${i}" style="text-align:center;font-weight:800;color:${col}">${info.l}</td>
+      <td id="row-p4-${i}" style="text-align:center;font-weight:800;color:${col}">${info.p4.toFixed(1)}</td>
+      <td style="padding:4px;text-align:center">
         <button class="btn btn-danger btn-icon btn-sm" onclick="gpaRows.splice(${i},1);renderGPATable()">✕</button>
       </td>
     </tr>`;
@@ -2289,48 +2317,89 @@ function renderGPATable(){
   calcGPA();
 }
 
+// Hàm mới để cập nhật điểm từng dòng theo thời gian thực mà không làm mất focus chuột
+function updateGPAInput(index, field, value) {
+  gpaRows[index][field] = value === '' ? 0 : Number(value);
+  
+  // Lấy dữ liệu dòng hiện tại
+  const r = gpaRows[index];
+  const fScore = (r.p10||0)*0.1 + (r.p20a||0)*0.2 + (r.p20b||0)*0.2 + (r.p50||0)*0.5;
+  const info = getGPAInfo(fScore);
+  const col = info.p4>=3.2 ? 'var(--green)' : info.p4>=2.5 ? 'var(--teal)' : info.p4>=2.0 ? 'var(--amber)' : 'var(--red)';
+  
+  // Cập nhật UI riêng cho dòng này
+  const elTk = document.getElementById(`row-tk-${index}`);
+  const elLetter = document.getElementById(`row-letter-${index}`);
+  const elP4 = document.getElementById(`row-p4-${index}`);
+  
+  if(elTk) elTk.textContent = (Math.round(fScore*10)/10).toFixed(1);
+  if(elLetter) {
+    elLetter.textContent = info.l;
+    elLetter.style.color = col;
+  }
+  if(elP4) {
+    elP4.textContent = info.p4.toFixed(1);
+    elP4.style.color = col;
+  }
+  
+  // Cập nhật điểm tổng kết GPA toàn khóa bên dưới
+  calcGPA();
+} 
+
 function calcGPA(){
   const valid=gpaRows.filter(r=>r.credits>0);
+  const r4=document.getElementById('gpa-result-4');
+  const r10=document.getElementById('gpa-result-10');
+  const rb=document.getElementById('gpa-rank-badge');
+  const an=document.getElementById('gpa-analysis');
+  
   if(!valid.length){
-    const r4=document.getElementById('gpa-result-4');
-    const r10=document.getElementById('gpa-result-10');
-    const rb=document.getElementById('gpa-rank-badge');
-    const an=document.getElementById('gpa-analysis');
     if(r4) r4.textContent='0.00';
     if(r10) r10.textContent='0.0';
     if(rb){rb.textContent='Chưa có dữ liệu';rb.style.background='var(--surface2)';rb.style.color='var(--text3)';}
     if(an) an.innerHTML='Hãy thêm môn học và nhập điểm để xem phân tích.';
     return;
   }
+  
   const totalTC=valid.reduce((a,r)=>a+r.credits,0);
-  const gpa4=valid.reduce((a,r)=>a+score10To4(r.score)*r.credits,0)/totalTC;
-  const gpa10=valid.reduce((a,r)=>a+r.score*r.credits,0)/totalTC;
-  const rank=gpa4Rank(gpa4);
-  const pct=Math.min(100,Math.round(gpa4/3.6*100));
+  let totalP4 = 0, totalP10 = 0;
+  
+  let best = {name:'', s:-1}, worst = {name:'', s:11};
+  let failed = [];
 
-  const r4=document.getElementById('gpa-result-4');
-  const r10=document.getElementById('gpa-result-10');
-  const rb=document.getElementById('gpa-rank-badge');
+  valid.forEach(r => {
+    const fScore = (r.p10||0)*0.1 + (r.p20a||0)*0.2 + (r.p20b||0)*0.2 + (r.p50||0)*0.5;
+    const roundedScore = Math.round(fScore * 10) / 10;
+    const info = getGPAInfo(fScore);
+    
+    totalP4 += info.p4 * r.credits;
+    totalP10 += fScore * r.credits;
+    
+    if (roundedScore > best.s) best = {name:r.name, s:roundedScore};
+    if (roundedScore < worst.s) worst = {name:r.name, s:roundedScore};
+    if (info.p4 === 0) failed.push(r.name);
+  });
+
+  const gpa4 = totalP4 / totalTC;
+  const gpa10 = totalP10 / totalTC;
+  const rank = gpa4Rank(gpa4);
+  const pct = Math.min(100,Math.round(gpa4/3.2*100)); // Lấy mốc Giỏi (3.2) làm thanh progress
+
   const bar=document.getElementById('gpa-bar');
   const pctT=document.getElementById('gpa-pct-text');
-  const an=document.getElementById('gpa-analysis');
 
   if(r4) r4.textContent=gpa4.toFixed(2);
-  if(r10) r10.textContent=gpa10.toFixed(1);
+  if(r10) r10.textContent=gpa10.toFixed(2);
   if(rb){rb.textContent=rank.label;rb.style.background=rank.bg;rb.style.color=rank.color;}
   if(bar) bar.style.width=pct+'%';
   if(pctT) pctT.textContent=pct+'%';
 
-  const worst=valid.reduce((a,r)=>r.score<a.score?r:a,valid[0]);
-  const best=valid.reduce((a,r)=>r.score>a.score?r:a,valid[0]);
-  const failed=valid.filter(r=>r.score<4.0);
-
   if(an) an.innerHTML=`
-    📚 Tổng <strong>${totalTC} tín chỉ</strong> — <strong>${valid.length} môn</strong><br>
-    🏆 Môn cao nhất: <strong style="color:var(--green)">${best.name} (${best.score})</strong><br>
-    ⚠️ Môn thấp nhất: <strong style="color:var(--amber)">${worst.name} (${worst.score})</strong><br>
-    ${failed.length?`❌ Môn chưa đạt: <strong style="color:var(--red)">${failed.map(r=>r.name).join(', ')}</strong><br>`:'✅ Tất cả môn đều đạt<br>'}
-    ${gpa4<3.6?`💡 Cần thêm <strong>${(3.6-gpa4).toFixed(2)}</strong> điểm để đạt <em>Xuất sắc</em>`:'🌟 Bạn đang ở mức Xuất sắc!'}
+    📚 Tổng cộng <strong>${totalTC} tín chỉ</strong> — <strong>${valid.length} môn</strong><br>
+    🏆 Môn cao nhất: <strong style="color:var(--green)">${best.name} (${best.s.toFixed(1)})</strong><br>
+    ⚠️ Môn thấp nhất: <strong style="color:var(--amber)">${worst.name} (${worst.s.toFixed(1)})</strong><br>
+    ${failed.length?`❌ Môn chưa đạt: <strong style="color:var(--red)">${failed.join(', ')}</strong><br>`:'✅ Tất cả môn đều đạt<br>'}
+    ${gpa4<3.6?`💡 Cần thêm <strong>${Math.max(0,3.6-gpa4).toFixed(2)}</strong> điểm Hệ 4 để đạt <em>Xuất sắc</em>`:'🌟 Bạn đang ở mức Xuất sắc tuyệt vời!'}
   `;
 
   // Update profile GPA
@@ -3173,7 +3242,6 @@ document.addEventListener('click',e=>{
 });
 </script>
 
-<!-- ═══ FIREBASE ═══ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged }
